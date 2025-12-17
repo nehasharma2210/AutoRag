@@ -1,0 +1,8 @@
+External dependencies used in this repo:
+
+AutoRag-website (static HTML)
+- Tailwind CSS (CDN): https://cdn.tailwindcss.com
+- Google Fonts: Inter (CSS): https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap
+
+Local assets referenced
+- assets/css/styles.css (referenced in HTML)

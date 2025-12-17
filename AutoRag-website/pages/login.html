@@ -77,6 +77,7 @@
     .gradient-text {
         background: linear-gradient(90deg, #7c3aed 0%, #8b5cf6 100%);
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
@@ -195,7 +196,7 @@
                 </div>
 
             <div class="mt-8">
-                <div class="space-y-6">
+                <form id="login-form" class="space-y-6">
                     <div>
                         <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
                         <div class="relative">
@@ -247,7 +248,7 @@
                             </svg>
                         </button>
                     </div>
-                </div>
+                </form>
 
                 <div class="mt-6">
                     <div class="divider">
@@ -414,6 +415,34 @@
         document.getElementById('google-login-btn').addEventListener('click', startGoogleLogin);
         document.getElementById('aws-login-btn').addEventListener('click', startAwsLogin);
         handleAuthRedirect();
+
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const resp = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await resp.json().catch(() => ({}));
+                if (!resp.ok) {
+                    alert(data && data.error ? data.error : 'Login failed');
+                    return;
+                }
+
+                if (data && data.token) {
+                    localStorage.setItem('auth_token', data.token);
+                }
+                window.location.href = 'documents.html';
+            } catch (err) {
+                alert('Login failed');
+            }
+        });
     </script>
 </body>
 </html>
