@@ -348,73 +348,16 @@
             menu.classList.toggle('hidden');
         });
 
-        const AUTH_CONFIG = {
-            cognitoDomain: '',
-            clientId: '',
-            scope: 'openid profile email',
-            responseType: 'token'
-        };
-
-        function getRedirectUri() {
-            return window.location.origin + window.location.pathname;
-        }
-
-        function requireAuthConfig() {
-            if (!AUTH_CONFIG.cognitoDomain || !AUTH_CONFIG.clientId) {
-                alert('Please configure AUTH_CONFIG.cognitoDomain and AUTH_CONFIG.clientId in pages/login.html and pages/signup.html');
-                return false;
-            }
-            return true;
-        }
-
-        function buildCognitoUrl(path, extraParams) {
-            const url = new URL('https://' + AUTH_CONFIG.cognitoDomain + path);
-            url.searchParams.set('client_id', AUTH_CONFIG.clientId);
-            url.searchParams.set('redirect_uri', getRedirectUri());
-            url.searchParams.set('response_type', AUTH_CONFIG.responseType);
-            url.searchParams.set('scope', AUTH_CONFIG.scope);
-
-            if (extraParams) {
-                Object.keys(extraParams).forEach((k) => url.searchParams.set(k, extraParams[k]));
-            }
-
-            return url.toString();
-        }
-
         function startGoogleLogin() {
-            if (!requireAuthConfig()) return;
-            window.location.href = buildCognitoUrl('/oauth2/authorize', { identity_provider: 'Google' });
+            window.location.href = '/api/auth/google';
         }
 
         function startAwsLogin() {
-            if (!requireAuthConfig()) return;
-            window.location.href = buildCognitoUrl('/login');
-        }
-
-        function handleAuthRedirect() {
-            const hash = window.location.hash ? window.location.hash.replace(/^#/, '') : '';
-            if (!hash) return;
-
-            const params = new URLSearchParams(hash);
-            const accessToken = params.get('access_token');
-            const idToken = params.get('id_token');
-            const tokenType = params.get('token_type');
-            const expiresIn = params.get('expires_in');
-
-            if (!accessToken && !idToken) return;
-
-            if (accessToken) localStorage.setItem('auth_access_token', accessToken);
-            if (idToken) localStorage.setItem('auth_id_token', idToken);
-            if (tokenType) localStorage.setItem('auth_token_type', tokenType);
-            if (expiresIn) localStorage.setItem('auth_expires_in', expiresIn);
-
-            window.history.replaceState({}, document.title, window.location.pathname);
-            window.location.href = 'documents.html';
+            alert('AWS login is not configured');
         }
 
         document.getElementById('google-login-btn').addEventListener('click', startGoogleLogin);
         document.getElementById('aws-login-btn').addEventListener('click', startAwsLogin);
-        handleAuthRedirect();
 
         document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -431,7 +374,29 @@
 
                 const data = await resp.json().catch(() => ({}));
                 if (!resp.ok) {
-                    alert(data && data.error ? data.error : 'Login failed');
+                    const errMsg = data && data.error ? data.error : 'Login failed';
+                    if (resp.status === 403 && errMsg === 'Email not verified') {
+                        const doResend = confirm('Email not verified. Resend verification email?');
+                        if (doResend) {
+                            try {
+                                const resendResp = await fetch('/api/auth/resend-verification', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ email })
+                                });
+                                if (resendResp.ok) {
+                                    alert('Verification email sent. Please check your inbox.');
+                                } else {
+                                    const resendData = await resendResp.json().catch(() => ({}));
+                                    alert(resendData && resendData.error ? resendData.error : 'Failed to resend verification email');
+                                }
+                            } catch (e) {
+                                alert('Failed to resend verification email');
+                            }
+                        }
+                        return;
+                    }
+                    alert(errMsg);
                     return;
                 }
 

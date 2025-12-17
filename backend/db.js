@@ -18,7 +18,12 @@ const UserSchema = new mongoose.Schema(
   {
     name: { type: String },
     email: { type: String, unique: true, required: true, index: true },
-    password_hash: { type: String, required: true },
+    password_hash: { type: String },
+    provider: { type: String, default: 'local' },
+    google_sub: { type: String, index: true },
+    verified: { type: Boolean, default: false },
+    verify_token: { type: String, index: true },
+    verify_token_expires_at: { type: Date },
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 );

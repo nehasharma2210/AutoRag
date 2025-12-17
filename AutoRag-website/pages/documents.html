@@ -422,6 +422,17 @@
             menu.classList.toggle('hidden');
         });
 
+        (function captureTokenFromUrl() {
+            const params = new URLSearchParams(window.location.search || '');
+            const token = params.get('token');
+            if (!token) return;
+            localStorage.setItem('auth_token', token);
+            params.delete('token');
+            const newQuery = params.toString();
+            const newUrl = window.location.pathname + (newQuery ? `?${newQuery}` : '') + window.location.hash;
+            window.history.replaceState({}, document.title, newUrl);
+        })();
+
         function getAuthToken() {
             return localStorage.getItem('auth_token') || '';
         }

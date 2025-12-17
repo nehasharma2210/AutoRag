@@ -341,73 +341,16 @@
             menu.classList.toggle('hidden');
         });
 
-        const AUTH_CONFIG = {
-            cognitoDomain: '',
-            clientId: '',
-            scope: 'openid profile email',
-            responseType: 'token'
-        };
-
-        function getRedirectUri() {
-            return window.location.origin + window.location.pathname;
-        }
-
-        function requireAuthConfig() {
-            if (!AUTH_CONFIG.cognitoDomain || !AUTH_CONFIG.clientId) {
-                alert('Please configure AUTH_CONFIG.cognitoDomain and AUTH_CONFIG.clientId in pages/login.html and pages/signup.html');
-                return false;
-            }
-            return true;
-        }
-
-        function buildCognitoUrl(path, extraParams) {
-            const url = new URL('https://' + AUTH_CONFIG.cognitoDomain + path);
-            url.searchParams.set('client_id', AUTH_CONFIG.clientId);
-            url.searchParams.set('redirect_uri', getRedirectUri());
-            url.searchParams.set('response_type', AUTH_CONFIG.responseType);
-            url.searchParams.set('scope', AUTH_CONFIG.scope);
-
-            if (extraParams) {
-                Object.keys(extraParams).forEach((k) => url.searchParams.set(k, extraParams[k]));
-            }
-
-            return url.toString();
-        }
-
         function startGoogleSignup() {
-            if (!requireAuthConfig()) return;
-            window.location.href = buildCognitoUrl('/oauth2/authorize', { identity_provider: 'Google' });
+            window.location.href = '/api/auth/google';
         }
 
         function startAwsSignup() {
-            if (!requireAuthConfig()) return;
-            window.location.href = buildCognitoUrl('/signup');
-        }
-
-        function handleAuthRedirect() {
-            const hash = window.location.hash ? window.location.hash.replace(/^#/, '') : '';
-            if (!hash) return;
-
-            const params = new URLSearchParams(hash);
-            const accessToken = params.get('access_token');
-            const idToken = params.get('id_token');
-            const tokenType = params.get('token_type');
-            const expiresIn = params.get('expires_in');
-
-            if (!accessToken && !idToken) return;
-
-            if (accessToken) localStorage.setItem('auth_access_token', accessToken);
-            if (idToken) localStorage.setItem('auth_id_token', idToken);
-            if (tokenType) localStorage.setItem('auth_token_type', tokenType);
-            if (expiresIn) localStorage.setItem('auth_expires_in', expiresIn);
-
-            window.history.replaceState({}, document.title, window.location.pathname);
-            window.location.href = 'documents.html';
+            alert('AWS signup is not configured');
         }
 
         document.getElementById('google-signup-btn').addEventListener('click', startGoogleSignup);
         document.getElementById('aws-signup-btn').addEventListener('click', startAwsSignup);
-        handleAuthRedirect();
 
         document.getElementById('signup-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -435,10 +378,8 @@
                     return;
                 }
 
-                if (data && data.token) {
-                    localStorage.setItem('auth_token', data.token);
-                }
-                window.location.href = 'documents.html';
+                alert('Account created. Please verify your email (check inbox). After verification, you can log in.');
+                window.location.href = 'login.html';
             } catch (err) {
                 alert('Signup failed');
             }
