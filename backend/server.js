@@ -131,11 +131,18 @@ app.post('/api/auth/signup', async (req, res) => {
       verify_token_expires_at: expiresAt,
     });
 
-    await sendVerificationEmail(req, user, plainVerifyToken);
+    let emailSent = false;
+    try {
+      await sendVerificationEmail(req, user, plainVerifyToken);
+      emailSent = true;
+    } catch (mailErr) {
+      console.error('Failed to send verification email:', mailErr && (mailErr.message || String(mailErr)));
+    }
 
     return res.status(201).json({
       ok: true,
       requires_verification: true,
+      email_sent: emailSent,
       user: {
         id: String(user._id),
         name: user.name,
@@ -201,8 +208,15 @@ app.post('/api/auth/resend-verification', async (req, res) => {
   user.verify_token_expires_at = expiresAt;
   await user.save();
 
-  await sendVerificationEmail(req, user, plainVerifyToken);
-  return res.json({ ok: true });
+  let emailSent = false;
+  try {
+    await sendVerificationEmail(req, user, plainVerifyToken);
+    emailSent = true;
+  } catch (mailErr) {
+    console.error('Failed to resend verification email:', mailErr && (mailErr.message || String(mailErr)));
+  }
+
+  return res.json({ ok: true, email_sent: emailSent });
 });
 
 app.post('/api/auth/login', async (req, res) => {
