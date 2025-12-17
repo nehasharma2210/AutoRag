@@ -11,18 +11,56 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: { 50: '#f0f9ff', 600: '#0284c7' },
-                        secondary: { 50: '#f5f3ff', 600: '#7c3aed' }
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        },
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
+    <style>
+        @keyframes gradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-animated {
+            background: linear-gradient(-45deg, #0284c7, #7c3aed, #0ea5e9, #8b5cf6);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans">
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -33,15 +71,15 @@
                     </a>
                 </div>
                 <nav class="hidden md:flex items-center space-x-8">
-                    <a href="../index.html" class="text-gray-600 hover:text-primary-600">Home</a>
-                    <a href="documents.html" class="text-gray-600 hover:text-primary-600">Documents</a>
-                    <a href="features.html" class="text-gray-600 hover:text-primary-600">Features</a>
-                    <a href="pricing.html" class="text-primary-600 font-medium">Pricing</a>
-                    <a href="contact.html" class="text-gray-600 hover:text-primary-600">Contact</a>
+                    <a href="../index.html" class="text-gray-600 hover:text-primary-600 transition-colors">Home</a>
+                    <a href="documents.html" class="text-gray-600 hover:text-primary-600 transition-colors">Document Library</a>
+                    <a href="features.html" class="text-gray-600 hover:text-primary-600 transition-colors">Features</a>
+                    <a href="pricing.html" class="text-primary-600 font-medium hover:text-primary-800 transition-colors">Pricing</a>
+                    <a href="contact.html" class="text-gray-600 hover:text-primary-600 transition-colors">Contact</a>
                 </nav>
                 <div class="flex items-center space-x-4">
-                    <a href="login.html" class="text-gray-600 hover:text-primary-600">Log in</a>
-                    <a href="signup.html" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700">
+                    <a href="login.html" class="text-gray-600 hover:text-primary-600 transition-colors">Log in</a>
+                    <a href="signup.html" class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-4 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium">
                         Get Started
                     </a>
                 </div>
@@ -57,14 +95,14 @@
         <!-- Mobile menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
             <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="../index.html" class="block px-3 py-2 text-gray-600 hover:bg-gray-50">Home</a>
-                <a href="documents.html" class="block px-3 py-2 text-gray-600 hover:bg-gray-50">Documents</a>
-                <a href="features.html" class="block px-3 py-2 text-gray-600 hover:bg-gray-50">Features</a>
-                <a href="pricing.html" class="block px-3 py-2 text-primary-600 bg-gray-50">Pricing</a>
-                <a href="contact.html" class="block px-3 py-2 text-gray-600 hover:bg-gray-50">Contact</a>
+                <a href="../index.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Home</a>
+                <a href="documents.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Document Library</a>
+                <a href="features.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Features</a>
+                <a href="pricing.html" class="block px-3 py-2 text-base font-medium text-primary-600 bg-gray-50">Pricing</a>
+                <a href="contact.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Contact</a>
                 <div class="pt-4 border-t border-gray-200">
-                    <a href="login.html" class="block w-full text-center px-4 py-2 text-gray-600 hover:bg-gray-50">Log in</a>
-                    <a href="signup.html" class="mt-2 block w-full text-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
+                    <a href="login.html" class="block w-full text-center px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Log in</a>
+                    <a href="signup.html" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:opacity-95">
                         Get Started
                     </a>
                 </div>
@@ -73,37 +111,50 @@
     </header>
 
     <!-- Pricing -->
-    <div class="py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
+    <section class="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+        <div class="absolute inset-0">
+            <div class="absolute top-16 -left-24 w-80 h-80 bg-purple-300/30 rounded-full blur-3xl"></div>
+            <div class="absolute top-40 -right-24 w-80 h-80 bg-blue-300/30 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-pink-300/20 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative max-w-7xl mx-auto">
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-900 sm:text-5xl">Pricing Plans</h1>
-                <p class="mt-4 text-xl text-gray-600">Choose the perfect plan for your needs</p>
+                <span class="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium bg-white/70 backdrop-blur border border-gray-200 shadow-sm">
+                    Simple, transparent pricing
+                </span>
+                <h1 class="mt-6 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
+                    Plans that scale with your team
+                </h1>
+                <p class="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+                    Start free, upgrade when you need more documents, faster retrieval, and advanced support.
+                </p>
             </div>
 
             <!-- Toggle -->
             <div class="mt-8 flex justify-center">
-                <div class="bg-gray-100 p-1 rounded-lg">
-                    <button class="px-4 py-2 rounded-md bg-white shadow-sm text-sm font-medium text-gray-700">Monthly</button>
-                    <button class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700">Yearly <span class="text-green-500 ml-1">(Save 20%)</span></button>
+                <div class="bg-white/70 backdrop-blur p-1 rounded-xl border border-gray-200 shadow-sm">
+                    <button class="px-5 py-2.5 rounded-lg bg-white shadow text-sm font-semibold text-gray-900">Monthly</button>
+                    <button class="px-5 py-2.5 rounded-lg text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">Yearly <span class="text-green-600 ml-1">(Save 20%)</span></button>
                 </div>
             </div>
 
             <!-- Pricing Cards -->
             <div class="mt-12 grid gap-8 md:grid-cols-3">
                 <!-- Free Tier -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div class="p-6">
+                <div class="group bg-white/90 backdrop-blur rounded-2xl shadow-xl overflow-hidden border border-gray-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="p-8">
                         <h2 class="text-xl font-bold text-gray-900">Starter</h2>
-                        <p class="mt-2 text-gray-600">Perfect for individuals</p>
-                        <div class="mt-6">
-                            <span class="text-4xl font-bold">$0</span>
+                        <p class="mt-2 text-gray-600">Perfect for personal projects and prototypes</p>
+                        <div class="mt-6 flex items-baseline gap-2">
+                            <span class="text-5xl font-extrabold text-gray-900">$0</span>
                             <span class="text-gray-500">/month</span>
                         </div>
-                        <a href="#" class="mt-6 block w-full bg-gray-800 text-white text-center py-2 rounded-md hover:bg-gray-700">
-                            Get Started
+                        <a href="signup.html" class="mt-8 block w-full bg-gray-900 text-white text-center py-3 rounded-xl hover:bg-gray-800 transition-colors font-semibold">
+                            Get started free
                         </a>
                     </div>
-                    <div class="border-t border-gray-200 p-6">
+                    <div class="border-t border-gray-200 p-8 bg-gradient-to-b from-white to-gray-50">
                         <h3 class="text-sm font-medium text-gray-900">Features</h3>
                         <ul class="mt-4 space-y-3">
                             <li class="flex items-center">
@@ -129,22 +180,22 @@
                 </div>
 
                 <!-- Team Tier -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-primary-500">
-                    <div class="bg-primary-600 px-4 py-2 text-center">
-                        <span class="text-sm font-medium text-white">MOST POPULAR</span>
+                <div class="relative bg-white/95 backdrop-blur rounded-2xl shadow-2xl overflow-hidden border-2 border-primary-500">
+                    <div class="gradient-animated px-4 py-2 text-center">
+                        <span class="text-sm font-semibold text-white tracking-wide">MOST POPULAR</span>
                     </div>
-                    <div class="p-6">
+                    <div class="p-8">
                         <h2 class="text-xl font-bold text-gray-900">Team</h2>
-                        <p class="mt-2 text-gray-600">For growing teams</p>
-                        <div class="mt-6">
-                            <span class="text-4xl font-bold">$49</span>
+                        <p class="mt-2 text-gray-600">For startups and fast-moving teams</p>
+                        <div class="mt-6 flex items-baseline gap-2">
+                            <span class="text-5xl font-extrabold text-gray-900">$49</span>
                             <span class="text-gray-500">/month</span>
                         </div>
-                        <a href="#" class="mt-6 block w-full bg-primary-600 text-white text-center py-2 rounded-md hover:bg-primary-700">
-                            Start Free Trial
+                        <a href="signup.html" class="mt-8 block w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white text-center py-3 rounded-xl hover:shadow-lg transition-all font-semibold">
+                            Start free trial
                         </a>
                     </div>
-                    <div class="border-t border-gray-200 p-6">
+                    <div class="border-t border-gray-200 p-8 bg-gradient-to-b from-white to-gray-50">
                         <h3 class="text-sm font-medium text-gray-900">Everything in Free, plus</h3>
                         <ul class="mt-4 space-y-3">
                             <li class="flex items-center">
@@ -176,18 +227,18 @@
                 </div>
 
                 <!-- Enterprise Tier -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div class="p-6">
+                <div class="group bg-white/90 backdrop-blur rounded-2xl shadow-xl overflow-hidden border border-gray-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="p-8">
                         <h2 class="text-xl font-bold text-gray-900">Enterprise</h2>
                         <p class="mt-2 text-gray-600">For large organizations</p>
                         <div class="mt-6">
-                            <span class="text-4xl font-bold">Custom</span>
+                            <span class="text-4xl font-extrabold text-gray-900">Custom</span>
                         </div>
-                        <a href="#" class="mt-6 block w-full bg-gray-800 text-white text-center py-2 rounded-md hover:bg-gray-700">
-                            Contact Sales
+                        <a href="contact.html" class="mt-8 block w-full bg-white text-gray-900 text-center py-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-semibold">
+                            Contact sales
                         </a>
                     </div>
-                    <div class="border-t border-gray-200 p-6">
+                    <div class="border-t border-gray-200 p-8 bg-gradient-to-b from-white to-gray-50">
                         <h3 class="text-sm font-medium text-gray-900">Everything in Team, plus</h3>
                         <ul class="mt-4 space-y-3">
                             <li class="flex items-center">
@@ -219,22 +270,23 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- FAQ -->
-    <div class="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
+    <div class="bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
         <div class="max-w-3xl mx-auto">
-            <h2 class="text-3xl font-bold text-center text-gray-900">Frequently Asked Questions</h2>
-            <div class="mt-12 space-y-6">
-                <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-3xl font-extrabold text-center text-gray-900">Frequently Asked Questions</h2>
+            <p class="mt-4 text-lg text-center text-gray-600">Everything you need to know about plans and billing.</p>
+            <div class="mt-12 grid gap-6 md:grid-cols-2">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
                     <h3 class="text-lg font-medium text-gray-900">What's included in the free plan?</h3>
                     <p class="mt-2 text-gray-600">The free plan includes up to 100 documents, 1,000 queries per month, and community support.</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
                     <h3 class="text-lg font-medium text-gray-900">Can I upgrade or downgrade my plan?</h3>
                     <p class="mt-2 text-gray-600">Yes, you can change your plan at any time. Upgrades take effect immediately, while downgrades apply at the next billing cycle.</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow md:col-span-2">
                     <h3 class="text-lg font-medium text-gray-900">Do you offer discounts for non-profits?</h3>
                     <p class="mt-2 text-gray-600">Yes, we offer special pricing for non-profit organizations. Please contact our sales team for more information.</p>
                 </div>
@@ -243,70 +295,82 @@
     </div>
 
     <!-- CTA -->
-    <div class="bg-primary-600">
-        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
+    <section class="relative gradient-animated overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="relative max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:py-20 lg:px-8 lg:flex lg:items-center lg:justify-between">
             <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
                 <span class="block">Ready to get started?</span>
                 <span class="block text-primary-100">Start your free 14-day trial today.</span>
             </h2>
             <div class="mt-8 flex lg:mt-0 lg:flex-shrink-0">
                 <div class="inline-flex rounded-md shadow">
-                    <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-gray-50">
+                    <a href="signup.html" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-xl text-gray-900 bg-white hover:bg-gray-50 transition-colors">
                         Get started
                     </a>
                 </div>
                 <div class="ml-3 inline-flex rounded-md shadow">
-                    <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-500 bg-opacity-60 hover:bg-opacity-70">
+                    <a href="contact.html" class="inline-flex items-center justify-center px-6 py-3 border border-white/30 text-base font-semibold rounded-xl text-white glass-effect hover:bg-white/20 transition-colors">
                         Contact sales
                     </a>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-800">
+    <footer class="bg-white border-t border-gray-200">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
-            <div class="md:flex md:justify-between">
-                <div class="space-y-8">
-                    <div class="flex items-center">
-                        <span class="text-2xl font-bold text-white">
-                            <span class="bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">
-                                AutoRAG
-                            </span>
-                        </span>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-900">AutoRAG</h3>
+                    <p class="mt-4 text-gray-600 max-w-md">
+                        The autonomous RAG engine that self-heals and improves with every interaction.
+                    </p>
+                    <div class="flex space-x-6 mt-6">
+                        <a href="#" class="text-gray-400 hover:text-gray-500">
+                            <span class="sr-only">GitHub</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-gray-500">
+                            <span class="sr-only">Twitter</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                            </svg>
+                        </a>
                     </div>
-                    <p class="text-gray-300">Making document processing and retrieval smarter with AI.</p>
                 </div>
-                <div class="mt-8 md:mt-0 grid grid-cols-2 gap-8 md:grid-cols-3">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Product</h3>
-                        <ul class="mt-4 space-y-4">
-                            <li><a href="#" class="text-base text-gray-400 hover:text-white">Features</a></li>
-                            <li><a href="#" class="text-base text-gray-400 hover:text-white">Pricing</a></li>
-                            <li><a href="#" class="text-base text-gray-400 hover:text-white">Documentation</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Company</h3>
-                        <ul class="mt-4 space-y-4">
-                            <li><a href="#" class="text-base text-gray-400 hover:text-white">About</a></li>
-                            <li><a href="#" class="text-base text-gray-400 hover:text-white">Blog</a></li>
-                            <li><a href="#" class="text-base text-gray-400 hover:text-white">Careers</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Legal</h3>
-                        <ul class="mt-4 space-y-4">
-                            <li><a href="#" class="text-base text-gray-400 hover:text-white">Privacy</a></li>
-                            <li><a href="#" class="text-base text-gray-400 hover:text-white">Terms</a></li>
-                            <li><a href="#" class="text-base text-gray-400 hover:text-white">Cookie Policy</a></li>
-                        </ul>
-                    </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase">Product</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="features.html" class="text-base text-gray-600 hover:text-primary-600">Features</a></li>
+                        <li><a href="pricing.html" class="text-base text-gray-600 hover:text-primary-600">Pricing</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Documentation</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Releases</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase">Company</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">About</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Blog</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Careers</a></li>
+                        <li><a href="contact.html" class="text-base text-gray-600 hover:text-primary-600">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase">Legal</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Privacy</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Terms</a></li>
+                    </ul>
                 </div>
             </div>
-            <div class="mt-8 border-t border-gray-700 pt-8">
-                <p class="text-base text-gray-400 text-center">&copy; 2023 AutoRAG. All rights reserved.</p>
+            <div class="mt-12 pt-8 border-t border-gray-200">
+                <p class="text-base text-gray-500 text-center">
+                    &copy; 2025 AutoRAG. All rights reserved.
+                </p>
             </div>
         </div>
     </footer>

@@ -14,11 +14,27 @@
                     colors: {
                         primary: {
                             50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
                             600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
                         },
                         secondary: {
                             50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
                             600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
                         },
                     },
                     fontFamily: {
@@ -28,10 +44,26 @@
             },
         }
     </script>
+    <style>
+        @keyframes gradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-animated {
+            background: linear-gradient(-45deg, #0284c7, #7c3aed, #0ea5e9, #8b5cf6);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans">
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -50,7 +82,7 @@
                 </nav>
                 <div class="flex items-center space-x-4">
                     <a href="login.html" class="text-gray-600 hover:text-primary-600 transition-colors">Log in</a>
-                    <a href="signup.html" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors">
+                    <a href="signup.html" class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-4 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium">
                         Get Started
                     </a>
                 </div>
@@ -73,7 +105,7 @@
                 <a href="contact.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Contact</a>
                 <div class="pt-4 border-t border-gray-200">
                     <a href="login.html" class="block w-full text-center px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Log in</a>
-                    <a href="signup.html" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
+                    <a href="signup.html" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:opacity-95">
                         Get Started
                     </a>
                 </div>
@@ -82,22 +114,22 @@
     </header>
 
     <!-- Main Content -->
-    <main class="py-10">
+    <main class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Page header -->
-            <div class="md:flex md:items-center md:justify-between mb-8">
+            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-gray-200 p-6 md:flex md:items-center md:justify-between mb-8">
                 <div class="flex-1 min-w-0">
-                    <h1 class="text-3xl font-bold text-gray-900">Document Library</h1>
+                    <h1 class="text-3xl font-extrabold text-gray-900">Document Library</h1>
                     <p class="mt-2 text-sm text-gray-600">Manage and organize your knowledge base documents</p>
                 </div>
                 <div class="mt-4 flex md:mt-0 md:ml-4">
-                    <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-200 rounded-xl shadow-sm text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                         <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
                         Export
                     </button>
-                    <button type="button" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    <button type="button" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                         <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                         </svg>
@@ -107,7 +139,7 @@
             </div>
 
             <!-- Search and filter -->
-            <div class="mb-6 bg-white shadow rounded-lg p-4">
+            <div class="mb-6 bg-white/90 backdrop-blur shadow-xl rounded-2xl border border-gray-200 p-5">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
                     <div class="flex-1">
                         <div class="relative">
@@ -142,11 +174,11 @@
             </div>
 
             <!-- Document list -->
-            <div class="bg-white shadow overflow-hidden sm:rounded-md">
+            <div class="bg-white/90 backdrop-blur shadow-xl overflow-hidden rounded-2xl border border-gray-200">
                 <ul role="list" class="divide-y divide-gray-200">
                     <!-- Document 1 -->
                     <li>
-                        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50">
+                        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50/70 transition-colors">
                             <div class="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
                                 <div class="truncate">
                                     <div class="flex text-sm">
@@ -186,7 +218,7 @@
 
                     <!-- Document 2 -->
                     <li>
-                        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50">
+                        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50/70 transition-colors">
                             <div class="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
                                 <div class="truncate">
                                     <div class="flex text-sm">
@@ -226,7 +258,7 @@
 
                     <!-- Document 3 -->
                     <li>
-                        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50">
+                        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50/70 transition-colors">
                             <div class="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
                                 <div class="truncate">
                                     <div class="flex text-sm">
@@ -266,7 +298,7 @@
 
                     <!-- Document 4 -->
                     <li>
-                        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50">
+                        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50/70 transition-colors">
                             <div class="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
                                 <div class="truncate">
                                     <div class="flex text-sm">
@@ -307,17 +339,17 @@
             </div>
 
             <!-- Pagination -->
-            <nav class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-6" aria-label="Pagination">
+            <nav class="bg-white/90 backdrop-blur px-4 py-4 flex items-center justify-between border border-gray-200 rounded-2xl shadow-xl sm:px-6 mt-6" aria-label="Pagination">
                 <div class="hidden sm:block">
                     <p class="text-sm text-gray-700">
                         Showing <span class="font-medium">1</span> to <span class="font-medium">4</span> of <span class="font-medium">12</span> results
                     </p>
                 </div>
                 <div class="flex-1 flex justify-between sm:justify-end">
-                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50">
                         Previous
                     </a>
-                    <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50">
                         Next
                     </a>
                 </div>
@@ -334,13 +366,28 @@
                     <p class="mt-4 text-gray-600 max-w-md">
                         The autonomous RAG engine that self-heals and improves with every interaction.
                     </p>
+                    <div class="flex space-x-6 mt-6">
+                        <a href="#" class="text-gray-400 hover:text-gray-500">
+                            <span class="sr-only">GitHub</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-gray-500">
+                            <span class="sr-only">Twitter</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                            </svg>
+                        </a>
+                    </div>
                 </div>
                 <div>
                     <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase">Product</h3>
                     <ul class="mt-4 space-y-2">
-                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Features</a></li>
+                        <li><a href="features.html" class="text-base text-gray-600 hover:text-primary-600">Features</a></li>
                         <li><a href="pricing.html" class="text-base text-gray-600 hover:text-primary-600">Pricing</a></li>
                         <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Documentation</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Releases</a></li>
                     </ul>
                 </div>
                 <div>
@@ -352,10 +399,17 @@
                         <li><a href="contact.html" class="text-base text-gray-600 hover:text-primary-600">Contact</a></li>
                     </ul>
                 </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase">Legal</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Privacy</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Terms</a></li>
+                    </ul>
+                </div>
             </div>
             <div class="mt-12 pt-8 border-t border-gray-200">
                 <p class="text-base text-gray-500 text-center">
-                    &copy; 2023 AutoRAG. All rights reserved.
+                    &copy; 2025 AutoRAG. All rights reserved.
                 </p>
             </div>
         </div>
