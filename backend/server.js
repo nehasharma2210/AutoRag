@@ -93,6 +93,126 @@ function requireAuth(req, res, next) {
   }
 }
 
+app.get('/api/auth/google/callback', async (req, res) => {
+  try {
+    // ... existing code ...
+    const user = await User.findOne({ email });
+    if (!user) {
+      // If user doesn't exist, redirect to login with an error
+      return res.redirect(`${getPublicBaseUrl(req)}/pages/login.html?error=invalid_credentials`);
+    }
+    // Update existing user
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      {
+        $set: {
+          name,
+          provider: 'google',
+          google_sub: googleSub,
+          verified: true,
+          verify_token: undefined,
+          verify_token_expires_at: undefined,
+        },
+      },
+      { new: true }
+    );
+    const jwtToken = jwt.sign({ userId: String(updatedUser._id), email: updatedUser.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const redirect = `${getPublicBaseUrl(req)}/pages/documents.html?token=${encodeURIComponent(jwtToken)}`;
+    return res.redirect(redirect);
+  } catch (e) {
+    console.error('Google auth failed:', e);
+    return res.redirect(`${getPublicBaseUrl(req)}/pages/login.html?error=auth_failed`);
+  }
+});
+
+app.get('/api/auth/google/callback', async (req, res) => {
+  const client = getGoogleOAuthClient();
+  if (!client) {
+    return res.status(500).send(`Google OAuth is not configured. Missing: ${getMissingGoogleEnvKeys().join(', ')}`);
+  }
+
+  if (req.query && req.query.error) {
+    const err = String(req.query.error || '');
+    const desc = String(req.query.error_description || '');
+    console.error('Google OAuth callback error:', err, desc);
+    return res.redirect(`${getPublicBaseUrl(req)}/pages/login.html?error=auth_failed&message=${encodeURIComponent(desc || 'Google OAuth error')}`);
+  }
+
+  const code = String(req.query.code || '');
+  if (!code) {
+    return res.redirect(`${getPublicBaseUrl(req)}/pages/login.html?error=missing_code&message=Missing authorization code`);
+  }
+
+  try {
+    // Exchange authorization code for tokens
+    const { tokens } = await client.getToken(code);
+    const idToken = tokens.id_token;
+    if (!idToken) {
+      return res.redirect(`${getPublicBaseUrl(req)}/pages/login.html?error=invalid_token&message=Missing ID token`);
+    }
+
+    // Verify the ID token
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email || !payload.sub) {
+      return res.redirect(`${getPublicBaseUrl(req)}/pages/login.html?error=invalid_token&message=Invalid Google token payload`);
+    }
+
+    if (!payload.email_verified) {
+      return res.redirect(`${getPublicBaseUrl(req)}/pages/login.html?error=email_not_verified&message=Google email not verified`);
+    }
+
+    const email = String(payload.email).toLowerCase();
+    const name = payload.name || payload.given_name || '';
+    const googleSub = String(payload.sub);
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      // User doesn't exist, redirect to login with error
+      return res.redirect(`${getPublicBaseUrl(req)}/pages/login.html?error=invalid_credentials&message=No account found with this email`);
+    }
+
+    // Update existing user with Google info
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      {
+        $set: {
+          name,
+          provider: 'google',
+          google_sub: googleSub,
+          verified: true,
+          verify_token: undefined,
+          verify_token_expires_at: undefined,
+        },
+      },
+      { new: true }
+    );
+
+    // Create JWT token
+    const jwtToken = jwt.sign(
+      { userId: String(updatedUser._id), email: updatedUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Redirect to documents page with token
+    const redirectUrl = `${getPublicBaseUrl(req)}/pages/documents.html?token=${encodeURIComponent(jwtToken)}`;
+    return res.redirect(redirectUrl);
+
+  } catch (error) {
+    console.error('Google auth failed:', error);
+    const errorMessage = error.message || 'Authentication failed';
+    return res.redirect(
+      `${getPublicBaseUrl(req)}/pages/login.html?error=auth_failed&message=${encodeURIComponent(errorMessage)}`
+    );
+  }
+});
+
 app.get('/api/health', async (req, res) => {
   const conn = mongoose.connection;
   res.json({
@@ -112,6 +232,12 @@ app.post('/api/auth/signup', async (req, res) => {
   }
   if (String(password).length < 6) {
     return res.status(400).json({ error: 'password must be at least 6 characters' });
+  }
+
+  // Check if user already exists
+  const existingUser = await User.findOne({ email: String(email).toLowerCase() });
+  if (existingUser) {
+    return res.status(400).json({ error: 'An account with this email already exists' });
   }
 
   const passwordHash = await bcrypt.hash(String(password), 10);
