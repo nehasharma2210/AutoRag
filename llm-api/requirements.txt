@@ -1,0 +1,21 @@
+# Core FastAPI dependencies
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.6.0
+
+# Core ML dependencies - compatible with Python 3.13
+numpy>=1.26.0
+faiss-cpu>=1.13.0
+sentence-transformers>=5.0.0
+datasets>=4.0.0
+requests>=2.31.0
+beautifulsoup4>=4.12.2
+duckduckgo-search>=8.0.0
+
+# PyTorch and Transformers
+torch>=2.1.0
+transformers>=4.50.0
+
+# Additional dependencies
+setuptools>=69.0.0
+wheel>=0.42.0
