@@ -18,6 +18,9 @@ import logging
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime
 from urllib.parse import quote, unquote
+import os
+import pickle
+from pathlib import Path
 
 from datasets import load_dataset
 from sentence_transformers import SentenceTransformer
@@ -69,7 +72,7 @@ BAD_PATTERNS = [
     r"instagram",
     r"linkedin",
     r"twitter",
-    r"©.*?copyright",
+    r"copyright.*?copyright",
     r"all rights reserved",
     r"related articles",
     r"you may also like",
@@ -83,6 +86,73 @@ BAD_PATTERNS = [
 embedder = None
 base_index = None
 base_chunks = None
+
+
+def _is_truthy_env(value: Optional[str]) -> bool:
+    if value is None:
+        return False
+    return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _cache_paths() -> Tuple[Path, Path]:
+    cache_dir = os.getenv("AUTORAG_CACHE_DIR")
+    if cache_dir:
+        base_dir = Path(cache_dir)
+    else:
+        base_dir = Path(__file__).resolve().parent / ".cache"
+    return base_dir / "base_index.faiss", base_dir / "base_chunks.pkl"
+
+
+def load_or_build_base_index(embedder: SentenceTransformer) -> Tuple[faiss.Index, List[str]]:
+    index_path, chunks_path = _cache_paths()
+    rebuild = _is_truthy_env(os.getenv("AUTORAG_REBUILD_CACHE")) or _is_truthy_env(os.getenv("AUTORAG_FORCE_REBUILD"))
+
+    if index_path.exists() and chunks_path.exists() and not rebuild:
+        logger.info("Loading cached base index and chunks...")
+        loaded_index = faiss.read_index(str(index_path))
+        with open(chunks_path, "rb") as f:
+            loaded_chunks = pickle.load(f)
+        logger.info(f"Loaded cached base index with {loaded_index.ntotal} vectors")
+        return loaded_index, loaded_chunks
+
+    logger.info("Building base index and chunks from scratch...")
+    dataset = load_dataset("wikitext", "wikitext-103-v1", split="train")
+
+    texts = []
+    for item in dataset:
+        t = item["text"].strip()
+        if t:
+            texts.append(t)
+        if len(texts) >= 1000:
+            break
+
+    logger.info(f"Loaded {len(texts)} texts from dataset")
+
+    built_chunks: List[str] = []
+    for t in texts:
+        built_chunks.extend(chunk_text(t))
+
+    logger.info(f"Created {len(built_chunks)} base chunks")
+
+    logger.info("Creating embeddings and FAISS index...")
+    base_embeddings = embedder.encode(
+        built_chunks,
+        batch_size=32,
+        show_progress_bar=True
+    )
+    base_embeddings = np.array(base_embeddings).astype("float32")
+    faiss.normalize_L2(base_embeddings)
+
+    built_index = faiss.IndexFlatIP(base_embeddings.shape[1])
+    built_index.add(base_embeddings)
+
+    index_path.parent.mkdir(parents=True, exist_ok=True)
+    faiss.write_index(built_index, str(index_path))
+    with open(chunks_path, "wb") as f:
+        pickle.dump(built_chunks, f)
+
+    logger.info(f"Saved base index cache to {index_path}")
+    return built_index, built_chunks
 
 
 class QueryRequest(BaseModel):
@@ -636,41 +706,9 @@ async def startup_event():
     # Load embedder
     logger.info("Loading sentence transformer model...")
     embedder = SentenceTransformer("all-MiniLM-L6-v2")
-    
-    # Load dataset
-    logger.info("Loading Wikitext dataset...")
-    dataset = load_dataset("wikitext", "wikitext-103-v1", split="train")
-    
-    texts = []
-    for item in dataset:
-        t = item["text"].strip()
-        if t:
-            texts.append(t)
-        if len(texts) >= 1000:
-            break
-    
-    logger.info(f"Loaded {len(texts)} texts from dataset")
-    
-    # Create chunks
-    base_chunks = []
-    for t in texts:
-        base_chunks.extend(chunk_text(t))
-    
-    logger.info(f"Created {len(base_chunks)} base chunks")
-    
-    # Create embeddings and index
-    logger.info("Creating embeddings and FAISS index...")
-    base_embeddings = embedder.encode(
-        base_chunks,
-        batch_size=32,
-        show_progress_bar=True
-    )
-    base_embeddings = np.array(base_embeddings).astype("float32")
-    faiss.normalize_L2(base_embeddings)
-    
-    base_index = faiss.IndexFlatIP(base_embeddings.shape[1])
-    base_index.add(base_embeddings)
-    
+
+    base_index, base_chunks = load_or_build_base_index(embedder)
+
     logger.info(f" RAG System initialized successfully! Base index contains {base_index.ntotal} vectors")
 
 
