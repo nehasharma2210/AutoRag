@@ -31,6 +31,13 @@ function getLlmApiBaseUrl() {
   return (configured || 'http://localhost:8000').replace(/\/$/, '');
 }
 
+function getLlmApiTimeoutMs() {
+  const configured = process.env.LLM_API_TIMEOUT_MS;
+  const parsed = configured ? Number(configured) : NaN;
+  if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  return 120000;
+}
+
 function requestJson(method, urlString, body, timeoutMs = 20000) {
   return new Promise((resolve, reject) => {
     const url = new URL(urlString);
@@ -650,7 +657,8 @@ app.post('/api/llm/query', requireAuth, async (req, res) => {
       ...(use_healing !== undefined ? { use_healing: Boolean(use_healing) } : {}),
     };
 
-    const data = await requestJson('POST', `${llmBase}/query`, payload);
+    const timeoutMs = getLlmApiTimeoutMs();
+    const data = await requestJson('POST', `${llmBase}/query`, payload, timeoutMs);
     return res.json(data);
   } catch (e) {
     const llmBase = getLlmApiBaseUrl();
