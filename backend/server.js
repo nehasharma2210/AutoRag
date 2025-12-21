@@ -5,6 +5,8 @@ const cors = require('cors');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
 const express = require('express');
+const http = require('http');
+const https = require('https');
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
@@ -22,6 +24,77 @@ function getPublicBaseUrl(req) {
   const configured = process.env.PUBLIC_BASE_URL;
   if (configured) return configured.replace(/\/$/, '');
   return `${req.protocol}://${req.get('host')}`;
+}
+
+function getLlmApiBaseUrl() {
+  const configured = process.env.LLM_API_BASE_URL;
+  return (configured || 'http://localhost:8000').replace(/\/$/, '');
+}
+
+function requestJson(method, urlString, body, timeoutMs = 20000) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(urlString);
+    const isHttps = url.protocol === 'https:';
+    const transport = isHttps ? https : http;
+
+    const payload = body === undefined ? undefined : Buffer.from(JSON.stringify(body));
+    const req = transport.request(
+      {
+        method,
+        protocol: url.protocol,
+        hostname: url.hostname,
+        port: url.port,
+        path: `${url.pathname}${url.search}`,
+        headers: {
+          Accept: 'application/json',
+          ...(payload
+            ? {
+                'Content-Type': 'application/json',
+                'Content-Length': payload.length,
+              }
+            : {}),
+        },
+      },
+      (res) => {
+        let raw = '';
+        res.setEncoding('utf8');
+        res.on('data', (chunk) => {
+          raw += chunk;
+        });
+        res.on('end', () => {
+          const status = res.statusCode || 0;
+          const contentType = String(res.headers['content-type'] || '');
+          const isJson = contentType.toLowerCase().includes('application/json');
+
+          let parsed = raw;
+          if (isJson && raw) {
+            try {
+              parsed = JSON.parse(raw);
+            } catch (e) {
+              return reject(new Error('Failed to parse JSON response from LLM API'));
+            }
+          }
+
+          if (status < 200 || status >= 300) {
+            const err = new Error(`LLM API request failed with status ${status}`);
+            err.status = status;
+            err.details = parsed;
+            return reject(err);
+          }
+
+          return resolve(parsed);
+        });
+      }
+    );
+
+    req.on('error', (err) => reject(err));
+    req.setTimeout(timeoutMs, () => {
+      req.destroy(new Error('LLM API request timed out'));
+    });
+
+    if (payload) req.write(payload);
+    req.end();
+  });
 }
 
 function buildSmtpTransport() {
@@ -48,7 +121,7 @@ async function sendVerificationEmail(req, user, plainToken) {
 
   if (!transport || !from) {
     console.log(`Email verification link (SMTP not configured): ${verifyUrl}`);
-    return;
+    return false;
   }
 
   await transport.sendMail({
@@ -58,6 +131,8 @@ async function sendVerificationEmail(req, user, plainToken) {
     text: `Verify your email by opening this link: ${verifyUrl}`,
     html: `<p>Verify your email by opening this link:</p><p><a href="${verifyUrl}">${verifyUrl}</a></p>`,
   });
+
+  return true;
 }
 
 function getGoogleOAuthClient() {
@@ -93,7 +168,8 @@ function requireAuth(req, res, next) {
   }
 }
 
-app.get('/api/auth/google/callback', async (req, res) => {
+app.get('/api/auth/google/callback', async (req, res, next) => {
+  return next();
   try {
     // ... existing code ...
     const user = await User.findOne({ email });
@@ -117,7 +193,7 @@ app.get('/api/auth/google/callback', async (req, res) => {
       { new: true }
     );
     const jwtToken = jwt.sign({ userId: String(updatedUser._id), email: updatedUser.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    const redirect = `${getPublicBaseUrl(req)}/pages/documents.html?token=${encodeURIComponent(jwtToken)}`;
+    const redirect = `${getPublicBaseUrl(req)}/pages/features.html?token=${encodeURIComponent(jwtToken)}`;
     return res.redirect(redirect);
   } catch (e) {
     console.error('Google auth failed:', e);
@@ -201,7 +277,7 @@ app.get('/api/auth/google/callback', async (req, res) => {
     );
 
     // Redirect to documents page with token
-    const redirectUrl = `${getPublicBaseUrl(req)}/pages/documents.html?token=${encodeURIComponent(jwtToken)}`;
+    const redirectUrl = `${getPublicBaseUrl(req)}/pages/features.html?token=${encodeURIComponent(jwtToken)}`;
     return res.redirect(redirectUrl);
 
   } catch (error) {
@@ -259,8 +335,7 @@ app.post('/api/auth/signup', async (req, res) => {
 
     let emailSent = false;
     try {
-      await sendVerificationEmail(req, user, plainVerifyToken);
-      emailSent = true;
+      emailSent = await sendVerificationEmail(req, user, plainVerifyToken);
     } catch (mailErr) {
       console.error('Failed to send verification email:', mailErr && (mailErr.message || String(mailErr)));
     }
@@ -308,7 +383,7 @@ app.get('/api/auth/verify-email', async (req, res) => {
   await user.save();
 
   const jwtToken = jwt.sign({ userId: String(user._id), email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
-  const redirect = `${getPublicBaseUrl(req)}/pages/documents.html?token=${encodeURIComponent(jwtToken)}`;
+  const redirect = `${getPublicBaseUrl(req)}/pages/features.html?token=${encodeURIComponent(jwtToken)}`;
   return res.redirect(redirect);
 });
 
@@ -336,8 +411,7 @@ app.post('/api/auth/resend-verification', async (req, res) => {
 
   let emailSent = false;
   try {
-    await sendVerificationEmail(req, user, plainVerifyToken);
-    emailSent = true;
+    emailSent = await sendVerificationEmail(req, user, plainVerifyToken);
   } catch (mailErr) {
     console.error('Failed to resend verification email:', mailErr && (mailErr.message || String(mailErr)));
   }
@@ -356,7 +430,7 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
-  if (user.provider === 'google') {
+  if (user.provider === 'google' && !user.password_hash) {
     return res.status(400).json({ error: 'Use Google login for this account' });
   }
 
@@ -462,7 +536,7 @@ app.get('/api/auth/google/callback', async (req, res) => {
     );
 
     const jwtToken = jwt.sign({ userId: String(user._id), email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    const redirect = `${getPublicBaseUrl(req)}/pages/documents.html?token=${encodeURIComponent(jwtToken)}`;
+    const redirect = `${getPublicBaseUrl(req)}/pages/features.html?token=${encodeURIComponent(jwtToken)}`;
     return res.redirect(redirect);
   } catch (e) {
     const msg = e && (e.message || String(e));
@@ -548,6 +622,43 @@ app.post('/api/documents', requireAuth, async (req, res) => {
       uploaded_at: doc.uploaded_at,
     },
   });
+});
+
+app.get('/api/llm/health', async (req, res) => {
+  try {
+    const llmBase = getLlmApiBaseUrl();
+    const data = await requestJson('GET', `${llmBase}/health`);
+    return res.json({ ok: true, llm: data });
+  } catch (e) {
+    const llmBase = getLlmApiBaseUrl();
+    return res.status(502).json({ ok: false, error: e.message || 'LLM API unavailable', llm_base: llmBase });
+  }
+});
+
+app.post('/api/llm/query', requireAuth, async (req, res) => {
+  try {
+    const { query, threshold, max_results, use_healing } = req.body || {};
+    if (!query || !String(query).trim()) {
+      return res.status(400).json({ error: 'query is required' });
+    }
+
+    const llmBase = getLlmApiBaseUrl();
+    const payload = {
+      query: String(query),
+      ...(threshold !== undefined ? { threshold: Number(threshold) } : {}),
+      ...(max_results !== undefined ? { max_results: Number(max_results) } : {}),
+      ...(use_healing !== undefined ? { use_healing: Boolean(use_healing) } : {}),
+    };
+
+    const data = await requestJson('POST', `${llmBase}/query`, payload);
+    return res.json(data);
+  } catch (e) {
+    const llmBase = getLlmApiBaseUrl();
+    const status = e && e.status ? Number(e.status) : 502;
+    const response = { error: e.message || 'Failed to call LLM API', llm_base: llmBase };
+    if (e && e.details !== undefined) response.details = e.details;
+    return res.status(status).json(response);
+  }
 });
 
 const staticRoot = path.join(__dirname, '..', 'AutoRag-website');

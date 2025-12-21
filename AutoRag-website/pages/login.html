@@ -143,8 +143,8 @@
                     <a href="contact.html" class="text-gray-600 hover:text-primary-600 transition-colors">Contact</a>
                 </nav>
                 <div class="flex items-center space-x-4">
-                    <a href="login.html" class="text-primary-600 font-medium hover:text-primary-800 transition-colors">Log in</a>
-                    <a href="signup.html" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors">
+                    <a id="nav-login" href="login.html" class="text-primary-600 font-medium hover:text-primary-800 transition-colors">Log in</a>
+                    <a id="nav-cta" href="signup.html" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors">
                         Get Started
                     </a>
                 </div>
@@ -161,13 +161,13 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="../index.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Home</a>
-                <a href="documents.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Document Library</a>
                 <a href="features.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Features</a>
-                <a href="pricing.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Pricing</a>
+                <a href="features.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Features</a>
+                
                 <a href="contact.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Contact</a>
                 <div class="pt-4 border-t border-gray-200">
-                    <a href="login.html" class="block w-full text-center px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Log in</a>
-                    <a href="signup.html" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
+                    <a id="mobile-nav-login" href="login.html" class="block w-full text-center px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Log in</a>
+                    <a id="mobile-nav-cta" href="signup.html" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
                         Get Started
                     </a>
                 </div>
@@ -195,86 +195,89 @@
                     </p>
                 </div>
 
-            <div class="mt-8">
-                <form id="login-form" class="space-y-6">
-                    <div>
-                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
-                                </svg>
-                            </div>
-                            <input id="email" name="email" type="email" autocomplete="email" required 
-                                class="input-field appearance-none block w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all sm:text-sm bg-gray-50/50">
-                        </div>
-                    </div>
+                <div id="login-error" class="hidden mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
 
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
-                            <div class="text-sm">
-                                <a href="#" class="font-semibold text-primary-600 hover:text-primary-700 transition-colors">
-                                    Forgot?
-                                </a>
-                            </div>
-                        </div>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                </svg>
-                            </div>
-                            <input id="password" name="password" type="password" autocomplete="current-password" required 
-                                class="input-field appearance-none block w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all sm:text-sm bg-gray-50/50">
-                        </div>
-                    </div>
-
-                    <div class="flex items-center">
-                        <input id="remember-me" name="remember-me" type="checkbox" 
-                            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
-                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">
-                            Remember me
-                        </label>
-                    </div>
-
-                    <div>
-                        <button type="submit" 
-                            class="btn-primary w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-base font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group">
-                            <span class="absolute inset-0 bg-gradient-to-r from-primary-600 to-secondary-600 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                            <span class="relative z-10">Sign in</span>
-                            <svg class="ml-2 w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </form>
-
-                <div class="mt-6">
-                    <div class="divider">
-                        <span class="divider-text">Or continue with</span>
-                    </div>
-
-                    <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="mt-8">
+                    <form id="login-form" class="space-y-6">
                         <div>
-                            <button type="button" id="google-login-btn" class="social-btn group w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:shadow-md">
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.2-1.4 3.5-5.4 3.5a6 6 0 010-12c1.7 0 2.9.7 3.5 1.3l2.4-2.3C16.6 3.2 14.5 2 12 2a10 10 0 100 20c5.7 0 9.5-4 9.5-9.6 0-.6-.1-1-.2-1.4H12z"/>
-                                    <path fill="#34A853" d="M3.8 7.2l3.2 2.3A6 6 0 0112 6c1.7 0 2.9.7 3.5 1.3l2.4-2.3C16.6 3.2 14.5 2 12 2 8.2 2 4.9 4.1 3.8 7.2z"/>
-                                    <path fill="#FBBC05" d="M12 22c2.5 0 4.6-.8 6.1-2.2l-2.8-2.1c-.7.5-1.7.9-3.3.9a6 6 0 01-5.7-4.1l-3.3 2.5C4.3 20.1 7.8 22 12 22z"/>
-                                    <path fill="#4285F4" d="M21.5 12.4c0-.6-.1-1-.2-1.4H12v3.9h5.4c-.3 1.5-1.3 2.8-2.7 3.5l2.8 2.1c1.6-1.5 2.6-3.8 2.6-6.1z"/>
-                                </svg>
-                                <span class="ml-2">Google</span>
-                            </button>
+                            <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+                                    </svg>
+                                </div>
+                                <input id="email" name="email" type="email" autocomplete="email" required 
+                                    class="input-field appearance-none block w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all sm:text-sm bg-gray-50/50">
+                            </div>
                         </div>
 
                         <div>
-                            <button type="button" id="aws-login-btn" class="social-btn group w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:shadow-md">
-                                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 001-7.874A5 5 0 006.5 9.5 3.5 3.5 0 003 13v2z" />
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
+                                <div class="text-sm">
+                                    <a href="#" class="font-semibold text-primary-600 hover:text-primary-700 transition-colors">
+                                        Forgot?
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                </div>
+                                <input id="password" name="password" type="password" autocomplete="current-password" required 
+                                    class="input-field appearance-none block w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all sm:text-sm bg-gray-50/50">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <input id="remember-me" name="remember-me" type="checkbox" 
+                                class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                            <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                                Remember me
+                            </label>
+                        </div>
+
+                        <div>
+                            <button type="submit" 
+                                class="btn-primary w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-base font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group">
+                                <span class="absolute inset-0 bg-gradient-to-r from-primary-600 to-secondary-600 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                                <span class="relative z-10">Sign in</span>
+                                <svg class="ml-2 w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                                 </svg>
-                                <span class="ml-2">AWS</span>
                             </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-6">
+                        <div class="divider">
+                            <span class="divider-text">Or continue with</span>
+                        </div>
+
+                        <div class="mt-6 grid grid-cols-2 gap-3">
+                            <div>
+                                <button type="button" id="google-login-btn" class="social-btn group w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:shadow-md">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.2-1.4 3.5-5.4 3.5a6 6 0 010-12c1.7 0 2.9.7 3.5 1.3l2.4-2.3C16.6 3.2 14.5 2 12 2a10 10 0 100 20c5.7 0 9.5-4 9.5-9.6 0-.6-.1-1-.2-1.4H12z"/>
+                                        <path fill="#34A853" d="M3.8 7.2l3.2 2.3A6 6 0 0112 6c1.7 0 2.9.7 3.5 1.3l2.4-2.3C16.6 3.2 14.5 2 12 2 8.2 2 4.9 4.1 3.8 7.2z"/>
+                                        <path fill="#FBBC05" d="M12 22c2.5 0 4.6-.8 6.1-2.2l-2.8-2.1c-.7.5-1.7.9-3.3.9a6 6 0 01-5.7-4.1l-3.3 2.5C4.3 20.1 7.8 22 12 22z"/>
+                                        <path fill="#4285F4" d="M21.5 12.4c0-.6-.1-1-.2-1.4H12v3.9h5.4c-.3 1.5-1.3 2.8-2.7 3.5l2.8 2.1c1.6-1.5 2.6-3.8 2.6-6.1z"/>
+                                    </svg>
+                                    <span class="ml-2">Google</span>
+                                </button>
+                            </div>
+
+                            <div>
+                                <button type="button" id="aws-login-btn" class="social-btn group w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 hover:shadow-md">
+                                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 001-7.874A5 5 0 006.5 9.5 3.5 3.5 0 003 13v2z" />
+                                    </svg>
+                                    <span class="ml-2">AWS</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -341,12 +344,58 @@
         </div>
     </footer>
 
+    <script src="../assets/auth.js"></script>
     <script>
         // Mobile menu toggle
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         });
+
+        function showLoginError(message, includeSignupLink) {
+            const box = document.getElementById('login-error');
+            if (!box) return;
+            const msg = String(message || '').trim();
+            if (!msg) {
+                box.classList.add('hidden');
+                box.textContent = '';
+                return;
+            }
+
+            box.classList.remove('hidden');
+            box.textContent = '';
+            const text = document.createElement('span');
+            text.textContent = msg;
+            box.appendChild(text);
+
+            if (includeSignupLink) {
+                const space = document.createElement('span');
+                space.textContent = ' ';
+                box.appendChild(space);
+
+                const link = document.createElement('a');
+                link.href = 'signup.html';
+                link.className = 'font-semibold underline';
+                link.textContent = 'Sign up';
+                box.appendChild(link);
+            }
+        }
+
+        (function () {
+            try {
+                const params = new URLSearchParams(window.location.search || '');
+                const err = String(params.get('error') || '').trim();
+                const msg = String(params.get('message') || '').trim();
+                if (!err && !msg) return;
+
+                if (err === 'invalid_credentials') {
+                    showLoginError(msg || 'Account not found or invalid credentials. Please sign up first.', true);
+                    return;
+                }
+
+                showLoginError(msg || 'Login failed. Please try again.', false);
+            } catch (e) {}
+        })();
 
         function startGoogleLogin() {
             window.location.href = '/api/auth/google';
@@ -377,6 +426,7 @@
                     const errMsg = data && data.error ? data.error : 'Login failed';
                     if (resp.status === 403 && errMsg === 'Email not verified') {
                         const doResend = confirm('Email not verified. Resend verification email?');
+
                         if (doResend) {
                             try {
                                 const resendResp = await fetch('/api/auth/resend-verification', {
@@ -396,16 +446,16 @@
                         }
                         return;
                     }
-                    alert(errMsg);
+                    showLoginError(errMsg, errMsg === 'Invalid credentials');
                     return;
                 }
 
                 if (data && data.token) {
                     localStorage.setItem('auth_token', data.token);
                 }
-                window.location.href = 'documents.html';
+                window.location.href = 'features.html';
             } catch (err) {
-                alert('Login failed');
+                showLoginError('Login failed', false);
             }
         });
     </script>

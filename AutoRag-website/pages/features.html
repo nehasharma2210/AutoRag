@@ -80,8 +80,8 @@
                     <a href="contact.html" class="text-gray-600 hover:text-primary-600 transition-colors">Contact</a>
                 </nav>
                 <div class="flex items-center space-x-4">
-                    <a href="login.html" class="text-gray-600 hover:text-primary-600 transition-colors">Log in</a>
-                    <a href="signup.html" class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-4 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium">
+                    <a id="nav-login" href="login.html" class="text-gray-600 hover:text-primary-600 transition-colors">Log in</a>
+                    <a id="nav-cta" href="signup.html" class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-4 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium">
                         Get Started
                     </a>
                 </div>
@@ -98,13 +98,13 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="../index.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Home</a>
-                <a href="documents.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Document Library</a>
+                <a href="aboutus.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">About Us</a>
                 <a href="features.html" class="block px-3 py-2 text-base font-medium text-primary-600 bg-gray-50">Features</a>
-                <a href="pricing.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Pricing</a>
+                
                 <a href="contact.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Contact</a>
                 <div class="pt-4 border-t border-gray-200">
-                    <a href="login.html" class="block w-full text-center px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Log in</a>
-                    <a href="signup.html" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:opacity-95">
+                    <a id="mobile-nav-login" href="login.html" class="block w-full text-center px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Log in</a>
+                    <a id="mobile-nav-cta" href="signup.html" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:opacity-95">
                         Get Started
                     </a>
                 </div>
@@ -335,6 +335,33 @@
         </div>
     </div>
 
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center mb-10">
+                <h2 class="text-base text-primary-600 font-semibold tracking-wide uppercase">Chatbot</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">Ask AutoRAG</p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">Query the self-healing RAG engine directly from this page.</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <div class="text-sm font-semibold text-gray-900">AutoRAG Assistant</div>
+                    <div id="chat-status" class="text-xs text-gray-500"></div>
+                </div>
+
+                <div id="chat-messages" class="h-[420px] overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-white to-gray-50"></div>
+
+                <div class="p-4 border-t border-gray-200 bg-white">
+                    <div class="flex items-center gap-3">
+                        <input id="chat-input" type="text" placeholder="Type your question..." class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-500" />
+                        <button id="chat-send" class="px-5 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-primary-600 to-secondary-600 hover:opacity-95 disabled:opacity-60 disabled:cursor-not-allowed">Send</button>
+                    </div>
+                    <!-- <div class="mt-2 text-xs text-gray-500">If you deploy the backend on another URL, set <span class="font-mono">api_base_url</span> in localStorage.</div> -->
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="relative gradient-animated overflow-hidden">
         <div class="absolute inset-0 bg-black/20"></div>
@@ -395,11 +422,150 @@
     </footer>
 
     <!-- Mobile menu toggle script -->
+    <script src="../assets/auth.js"></script>
     <script>
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         });
+
+        (function () {
+            const messagesEl = document.getElementById('chat-messages');
+            const inputEl = document.getElementById('chat-input');
+            const sendEl = document.getElementById('chat-send');
+            const statusEl = document.getElementById('chat-status');
+
+            if (!messagesEl || !inputEl || !sendEl) return;
+
+            function getApiBaseUrl() {
+                try {
+                    const v = String(localStorage.getItem('api_base_url') || '').trim();
+                    return v ? v.replace(/\/$/, '') : '';
+                } catch (e) {
+                    return '';
+                }
+            }
+
+            function getAuthToken() {
+                try {
+                    return String(localStorage.getItem('auth_token') || '');
+                } catch (e) {
+                    return '';
+                }
+            }
+
+            function setStatus(text) {
+                if (!statusEl) return;
+                statusEl.textContent = text || '';
+            }
+
+            function appendBubble(role, text) {
+                const row = document.createElement('div');
+                row.className = role === 'user' ? 'flex justify-end' : 'flex justify-start';
+
+                const bubble = document.createElement('div');
+                bubble.className = role === 'user'
+                    ? 'max-w-[85%] px-4 py-3 rounded-2xl bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow'
+                    : 'max-w-[85%] px-4 py-3 rounded-2xl bg-white border border-gray-200 text-gray-900 shadow-sm';
+                bubble.textContent = text;
+
+                row.appendChild(bubble);
+                messagesEl.appendChild(row);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+                return bubble;
+            }
+
+            function appendMeta(text) {
+                const el = document.createElement('div');
+                el.className = 'text-xs text-gray-500';
+                el.textContent = text;
+                messagesEl.appendChild(el);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+
+            appendBubble('assistant', 'Hi! Ask me anything. I will answer using the self-healing RAG engine.');
+
+            async function sendMessage() {
+                const q = String(inputEl.value || '').trim();
+                if (!q) return;
+
+                const token = getAuthToken();
+                if (!token) {
+                    appendBubble('assistant', 'Please log in first to use the chatbot.');
+                    return;
+                }
+
+                appendBubble('user', q);
+                inputEl.value = '';
+
+                sendEl.disabled = true;
+                inputEl.disabled = true;
+                setStatus('Thinking...');
+                const thinkingBubble = appendBubble('assistant', 'Working on it...');
+
+                try {
+                    const apiBase = getApiBaseUrl();
+                    const url = (apiBase ? apiBase : '') + '/api/llm/query';
+
+                    const resp = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token,
+                        },
+                        body: JSON.stringify({
+                            query: q,
+                            threshold: 0.5,
+                            max_results: 5,
+                            use_healing: true,
+                        }),
+                    });
+
+                    const data = await resp.json().catch(() => ({}));
+                    if (!resp.ok) {
+                        let msg = data && (data.error || data.detail) ? String(data.error || data.detail) : 'Request failed';
+                        if (data && data.details !== undefined) {
+                            let detailsText = '';
+                            try {
+                                detailsText = typeof data.details === 'string' ? data.details : JSON.stringify(data.details);
+                            } catch (e) {
+                                detailsText = String(data.details);
+                            }
+                            if (detailsText) msg += ' | details: ' + detailsText;
+                        }
+                        thinkingBubble.textContent = msg;
+                        setStatus('');
+                        return;
+                    }
+
+                    const answer = data && data.answer ? String(data.answer) : '';
+                    thinkingBubble.textContent = answer || 'No answer returned.';
+
+                    if (data && (data.trust_score_after !== undefined || data.healing_triggered !== undefined)) {
+                        const trust = data.trust_score_after !== undefined ? `trust_after=${data.trust_score_after}` : '';
+                        const healed = data.healing_triggered !== undefined ? `healing=${data.healing_triggered ? 'yes' : 'no'}` : '';
+                        const meta = [trust, healed].filter(Boolean).join(' • ');
+                        if (meta) appendMeta(meta);
+                    }
+                } catch (e) {
+                    const em = e && e.message ? String(e.message) : '';
+                    thinkingBubble.textContent = 'Failed to reach backend. Check backend URL and CORS.' + (em ? ' | ' + em : '');
+                } finally {
+                    sendEl.disabled = false;
+                    inputEl.disabled = false;
+                    setStatus('');
+                    inputEl.focus();
+                }
+            }
+
+            sendEl.addEventListener('click', sendMessage);
+            inputEl.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        })();
     </script>
 </body>
 </html>

@@ -80,8 +80,8 @@
                     <a href="contact.html" class="text-primary-600 font-medium hover:text-primary-800 transition-colors">Contact</a>
                 </nav>
                 <div class="flex items-center space-x-4">
-                    <a href="login.html" class="text-gray-600 hover:text-primary-600 transition-colors">Log in</a>
-                    <a href="signup.html" class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-4 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium">
+                    <a id="nav-login" href="login.html" class="text-gray-600 hover:text-primary-600 transition-colors">Log in</a>
+                    <a id="nav-cta" href="signup.html" class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-4 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium">
                         Get Started
                     </a>
                 </div>
@@ -98,13 +98,12 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="../index.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Home</a>
-                <a href="documents.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Document Library</a>
-                <a href="features.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Features</a>
-                <a href="pricing.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Pricing</a>
+                <a href="aboutus.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">About Us</a>
+                <a href="features.html" class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Features</a>                
                 <a href="contact.html" class="block px-3 py-2 text-base font-medium text-primary-600 bg-gray-50">Contact</a>
                 <div class="pt-4 border-t border-gray-200">
-                    <a href="login.html" class="block w-full text-center px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Log in</a>
-                    <a href="signup.html" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:opacity-95">
+                    <a id="mobile-nav-login" href="login.html" class="block w-full text-center px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50">Log in</a>
+                    <a id="mobile-nav-cta" href="signup.html" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:opacity-95">
                         Get Started
                     </a>
                 </div>
@@ -334,6 +333,7 @@
     </footer>
 
     <!-- Mobile menu toggle script -->
+    <script src="../assets/auth.js"></script>
     <script>
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             const menu = document.getElementById('mobile-menu');
