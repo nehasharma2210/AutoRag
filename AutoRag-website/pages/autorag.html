@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Features - AutoRAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: "#f0f9ff",
+                100: "#e0f2fe",
+                200: "#bae6fd",
+                300: "#7dd3fc",
+                400: "#38bdf8",
+                500: "#0ea5e9",
+                600: "#0284c7",
+                700: "#0369a1",
+                800: "#075985",
+                900: "#0c4a6e",
+              },
+              secondary: {
+                50: "#f5f3ff",
+                100: "#ede9fe",
+                200: "#ddd6fe",
+                300: "#c4b5fd",
+                400: "#a78bfa",
+                500: "#8b5cf6",
+                600: "#7c3aed",
+                700: "#6d28d9",
+                800: "#5b21b6",
+                900: "#4c1d95",
+              },
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @keyframes gradient {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .gradient-animated {
+        background: linear-gradient(-45deg, #0284c7, #7c3aed, #0ea5e9, #8b5cf6);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header
+      class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <a href="index.html" class="text-2xl font-bold text-gray-900">
+              <span
+                class="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent"
+              >
+                AutoRAG
+              </span>
+            </a>
+          </div>
+          <nav class="hidden md:flex items-center space-x-8">
+            <a
+              href="../index.html"
+              class="text-gray-600 hover:text-primary-600 transition-colors"
+              >Home</a
+            >
+            <a
+              href="autorag.html"
+              class="text-primary-600 font-medium hover:text-primary-800 transition-colors"
+              >Self Bot</a
+            >
+            <a
+              href="aboutus.html"
+              class="text-gray-600 hover:text-primary-600 transition-colors"
+              >About Us</a
+            >
+            <a
+              href="features.html"
+              class="text-gray-600 hover:text-primary-600 transition-colors"
+              >Features</a
+            >
+            <a
+              href="contact.html"
+              class="text-gray-600 hover:text-primary-600 transition-colors"
+              >Contact</a
+            >
+          </nav>
+          <div class="flex items-center space-x-4">
+            <a
+              id="nav-login"
+              href="pages/login.html"
+              class="text-gray-600 hover:text-primary-600 transition-colors"
+              >Log in</a
+            >
+            <a
+              id="nav-cta"
+              href="pages/signup.html"
+              class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-4 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium"
+            >
+              Get Started
+            </a>
+          </div>
+          <div class="md:hidden flex items-center">
+            <button
+              id="mobile-menu-button"
+              class="text-gray-600 hover:text-gray-900"
+            >
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16m-7 6h7"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Mobile menu -->
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t border-gray-200"
+      >
+        <div class="px-2 pt-2 pb-3 space-y-1">
+          <a
+            href="index.html"
+            class="block px-3 py-2 text-base font-medium text-primary-600"
+            >Home</a
+          >
+          <a
+            href="pages/aboutus.html"
+            class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50"
+            >About Us</a
+          >
+          <a
+            href="pages/features.html"
+            class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50"
+            >Features</a
+          >
+          <a
+            href="pages/contact.html"
+            class="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50"
+            >Contact</a
+          >
+          <div class="pt-4 border-t border-gray-200">
+            <a
+              id="mobile-nav-login"
+              href="pages/login.html"
+              class="block w-full text-center px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50"
+              >Log in</a
+            >
+            <a
+              id="mobile-nav-cta"
+              href="pages/signup.html"
+              class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
+            >
+              Get Started
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center mb-10">
+        <h2
+          class="text-base text-primary-600 font-semibold tracking-wide uppercase"
+        >
+          Chatbot
+        </h2>
+        <p
+          class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl"
+        >
+          Ask AutoRAG
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+          Query the self-healing RAG engine directly from this page.
+        </p>
+      </div>
+
+      <div
+        class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden"
+      >
+        <div
+          class="px-5 py-4 border-b border-gray-200 flex items-center justify-between"
+        >
+          <div class="text-sm font-semibold text-gray-900">
+            AutoRAG Assistant
+          </div>
+          <div id="chat-status" class="text-xs text-gray-500"></div>
+        </div>
+
+        <div
+          id="chat-messages"
+          class="h-[420px] overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-white to-gray-50"
+        ></div>
+
+        <div class="p-4 border-t border-gray-200 bg-white">
+          <div class="flex items-center gap-3">
+            <input
+              id="chat-input"
+              type="text"
+              placeholder="Type your question..."
+              class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-500"
+            />
+            <button
+              id="chat-send"
+              class="px-5 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-primary-600 to-secondary-600 hover:opacity-95 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Send
+            </button>
+          </div>
+          <!-- <div class="mt-2 text-xs text-gray-500">If you deploy the backend on another URL, set <span class="font-mono">api_base_url</span> in localStorage.</div> -->
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- Footer -->
+    <footer class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-900">AutoRAG</h3>
+                    <p class="mt-4 text-gray-600 max-w-md">
+                        The autonomous RAG engine that self-heals and improves with every interaction.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase">Product</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="features.html" class="text-base text-gray-600 hover:text-primary-600">Features</a></li>
+                        <li><a href="pricing.html" class="text-base text-gray-600 hover:text-primary-600">Pricing</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Documentation</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase">Company</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">About</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Blog</a></li>
+                        <li><a href="#" class="text-base text-gray-600 hover:text-primary-600">Careers</a></li>
+                        <li><a href="contact.html" class="text-base text-gray-600 hover:text-primary-600">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-gray-200">
+                <p class="text-base text-gray-500 text-center">
+                    &copy; 2025 AutoRAG. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile menu toggle script -->
+    <script src="../assets/auth.js"></script>
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        (function () {
+            const messagesEl = document.getElementById('chat-messages');
+            const inputEl = document.getElementById('chat-input');
+            const sendEl = document.getElementById('chat-send');
+            const statusEl = document.getElementById('chat-status');
+
+            if (!messagesEl || !inputEl || !sendEl) return;
+
+            function getApiBaseUrl() {
+                try {
+                    const v = String(localStorage.getItem('api_base_url') || '').trim();
+                    return v ? v.replace(/\/$/, '') : '';
+                } catch (e) {
+                    return '';
+                }
+            }
+
+            function getAuthToken() {
+                try {
+                    return String(localStorage.getItem('auth_token') || '');
+                } catch (e) {
+                    return '';
+                }
+            }
+
+            function setStatus(text) {
+                if (!statusEl) return;
+                statusEl.textContent = text || '';
+            }
+
+            function appendBubble(role, text) {
+                const row = document.createElement('div');
+                row.className = role === 'user' ? 'flex justify-end' : 'flex justify-start';
+
+                const bubble = document.createElement('div');
+                bubble.className = role === 'user'
+                    ? 'max-w-[85%] px-4 py-3 rounded-2xl bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow'
+                    : 'max-w-[85%] px-4 py-3 rounded-2xl bg-white border border-gray-200 text-gray-900 shadow-sm';
+                bubble.textContent = text;
+
+                row.appendChild(bubble);
+                messagesEl.appendChild(row);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+                return bubble;
+            }
+
+            function appendMeta(text) {
+                const el = document.createElement('div');
+                el.className = 'text-xs text-gray-500';
+                el.textContent = text;
+                messagesEl.appendChild(el);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+
+            appendBubble('assistant', 'Hi! Ask me anything. I will answer using the self-healing RAG engine.');
+
+            async function sendMessage() {
+                const q = String(inputEl.value || '').trim();
+                if (!q) return;
+
+                const token = getAuthToken();
+                if (!token) {
+                    appendBubble('assistant', 'Please log in first to use the chatbot.');
+                    return;
+                }
+
+                appendBubble('user', q);
+                inputEl.value = '';
+
+                sendEl.disabled = true;
+                inputEl.disabled = true;
+                setStatus('Thinking...');
+                const thinkingBubble = appendBubble('assistant', 'Working on it...');
+
+                try {
+                    const apiBase = getApiBaseUrl();
+                    const url = (apiBase ? apiBase : '') + '/api/llm/query';
+
+                    const resp = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token,
+                        },
+                        body: JSON.stringify({
+                            query: q,
+                            threshold: 0.5,
+                            max_results: 5,
+                            use_healing: true,
+                        }),
+                    });
+
+                    const data = await resp.json().catch(() => ({}));
+                    if (!resp.ok) {
+                        let msg = data && (data.error || data.detail) ? String(data.error || data.detail) : 'Request failed';
+                        if (data && data.details !== undefined) {
+                            let detailsText = '';
+                            try {
+                                detailsText = typeof data.details === 'string' ? data.details : JSON.stringify(data.details);
+                            } catch (e) {
+                                detailsText = String(data.details);
+                            }
+                            if (detailsText) msg += ' | details: ' + detailsText;
+                        }
+                        thinkingBubble.textContent = msg;
+                        setStatus('');
+                        return;
+                    }
+
+                    const answer = data && data.answer ? String(data.answer) : '';
+                    thinkingBubble.textContent = answer || 'No answer returned.';
+
+                    if (data && (data.trust_score_after !== undefined || data.healing_triggered !== undefined)) {
+                        const trust = data.trust_score_after !== undefined ? `trust_after=${data.trust_score_after}` : '';
+                        const healed = data.healing_triggered !== undefined ? `healing=${data.healing_triggered ? 'yes' : 'no'}` : '';
+                        const meta = [trust, healed].filter(Boolean).join(' • ');
+                        if (meta) appendMeta(meta);
+                    }
+                } catch (e) {
+                    const em = e && e.message ? String(e.message) : '';
+                    thinkingBubble.textContent = 'Failed to reach backend. Check backend URL and CORS.' + (em ? ' | ' + em : '');
+                } finally {
+                    sendEl.disabled = false;
+                    inputEl.disabled = false;
+                    setStatus('');
+                    inputEl.focus();
+                }
+            }
+
+            sendEl.addEventListener('click', sendMessage);
+            inputEl.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
+
+
+  </html>
+
