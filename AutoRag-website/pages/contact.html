@@ -187,7 +187,7 @@
                 <div class="lg:col-span-7">
                     <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
                         <div class="p-8 sm:p-10">
-                            <form id="contact-form" action="#" method="POST" class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
+                            <form id="contact-form-form" action="#" method="POST" class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
                                 <div class="sm:col-span-2">
                                     <label for="full-name" class="block text-sm font-semibold text-gray-900">Full name</label>
                                     <div class="mt-2">
@@ -195,29 +195,9 @@
                                     </div>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label for="email" class="block text-sm font-semibold text-gray-900">Email</label>
-                                    <div class="mt-2">
-                                        <input id="email" name="email" type="email" autocomplete="email" class="py-3 px-4 block w-full rounded-xl border border-gray-200 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                    </div>
-                                </div>
-                                <div class="sm:col-span-2">
                                     <label for="company" class="block text-sm font-semibold text-gray-900">Company</label>
                                     <div class="mt-2">
                                         <input type="text" name="company" id="company" autocomplete="organization" class="py-3 px-4 block w-full rounded-xl border border-gray-200 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                    </div>
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label for="phone" class="block text-sm font-semibold text-gray-900">Phone</label>
-                                    <div class="mt-2 relative rounded-xl shadow-sm">
-                                        <div class="absolute inset-y-0 left-0 flex items-center">
-                                            <label for="country" class="sr-only">Country</label>
-                                            <select id="country" name="country" class="h-full py-0 pl-3 pr-9 border-transparent bg-transparent text-gray-500 focus:ring-primary-500 focus:border-primary-500 rounded-xl">
-                                                <option>US</option>
-                                                <option>CA</option>
-                                                <option>EU</option>
-                                            </select>
-                                        </div>
-                                        <input type="text" name="phone" id="phone" autocomplete="tel" class="py-3 px-4 block w-full pl-20 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="+1 (555) 987-6543">
                                     </div>
                                 </div>
                                 <div class="sm:col-span-2">
@@ -340,16 +320,24 @@
             menu.classList.toggle('hidden');
         });
 
-        document.getElementById('contact-form').addEventListener('submit', async function(e) {
+        document.getElementById('contact-form-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const fullName = document.getElementById('full-name').value;
-            const email = document.getElementById('email').value;
             const company = document.getElementById('company').value;
-            const country = document.getElementById('country').value;
-            const phone = document.getElementById('phone').value;
             const message = document.getElementById('message').value;
             const privacyChecked = document.getElementById('privacy').checked;
+
+            let token = null;
+            try {
+                token = localStorage.getItem('auth_token');
+            } catch (e) {}
+
+            if (!token) {
+                alert('Please login to send a message.');
+                window.location.href = 'login.html';
+                return;
+            }
 
             if (!privacyChecked) {
                 alert('Please accept the Privacy Policy and Terms of Service.');
@@ -359,13 +347,13 @@
             try {
                 const resp = await fetch('/api/contact', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify({
                         full_name: fullName,
-                        email,
                         company,
-                        country,
-                        phone,
                         message
                     })
                 });
