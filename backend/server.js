@@ -104,6 +104,144 @@ function requestJson(method, urlString, body, timeoutMs = 20000) {
   });
 }
 
+function requestText(method, urlString, body, timeoutMs = 20000) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(urlString);
+    const isHttps = url.protocol === 'https:';
+    const transport = isHttps ? https : http;
+
+    const payload = body === undefined ? undefined : Buffer.from(JSON.stringify(body));
+    const req = transport.request(
+      {
+        method,
+        protocol: url.protocol,
+        hostname: url.hostname,
+        port: url.port,
+        path: `${url.pathname}${url.search}`,
+        headers: {
+          ...(payload
+            ? {
+                'Content-Type': 'application/json',
+                'Content-Length': payload.length,
+              }
+            : {}),
+        },
+      },
+      (res) => {
+        let raw = '';
+        res.setEncoding('utf8');
+        res.on('data', (chunk) => {
+          raw += chunk;
+        });
+        res.on('end', () => {
+          const status = res.statusCode || 0;
+          if (status < 200 || status >= 300) {
+            const err = new Error(`Request failed with status ${status}`);
+            err.status = status;
+            err.details = raw;
+            return reject(err);
+          }
+          return resolve(raw);
+        });
+      }
+    );
+
+    req.on('error', (err) => reject(err));
+    req.setTimeout(timeoutMs, () => {
+      req.destroy(new Error('Request timed out'));
+    });
+
+    if (payload) req.write(payload);
+    req.end();
+  });
+}
+
+function getMissingEmailJsEnvKeys() {
+  const missing = [];
+  if (!process.env.EMAILJS_SERVICE_ID) missing.push('EMAILJS_SERVICE_ID');
+  if (!process.env.EMAILJS_TEMPLATE_ID) missing.push('EMAILJS_TEMPLATE_ID');
+  if (!process.env.EMAILJS_PUBLIC_KEY) missing.push('EMAILJS_PUBLIC_KEY');
+  return missing;
+}
+
+async function sendContactEmailViaEmailJs(contact) {
+  const missing = getMissingEmailJsEnvKeys();
+  if (missing.length) {
+    const err = new Error(`EmailJS is not configured. Missing: ${missing.join(', ')}`);
+    err.status = 500;
+    throw err;
+  }
+
+  const apiUrl = (process.env.EMAILJS_API_URL || 'https://api.emailjs.com/api/v1.0/email/send').trim();
+  const now = new Date();
+
+  await requestText(
+    'POST',
+    apiUrl,
+    {
+      service_id: process.env.EMAILJS_SERVICE_ID,
+      template_id: process.env.EMAILJS_TEMPLATE_ID,
+      user_id: process.env.EMAILJS_PUBLIC_KEY,
+      template_params: {
+        name: contact.full_name || '',
+        email: contact.email || '',
+        message: contact.message || '',
+        date: now.toISOString(),
+        full_name: contact.full_name || '',
+        company: contact.company || '',
+      },
+    },
+    20000
+  );
+}
+
+async function sendContactEmailViaSmtp(contact) {
+  const transport = buildSmtpTransport();
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const to = process.env.CONTACT_TO_EMAIL || process.env.SMTP_USER;
+
+  if (!transport || !from || !to) {
+    const missing = [];
+    if (!transport) missing.push('SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS');
+    if (!from) missing.push('SMTP_FROM or SMTP_USER');
+    if (!to) missing.push('CONTACT_TO_EMAIL or SMTP_USER');
+    const err = new Error(`SMTP is not configured. Missing: ${missing.join(', ')}`);
+    err.status = 500;
+    throw err;
+  }
+
+  const subject = `New Contact Form Submission - AutoRAG`;
+  const safeName = contact.full_name ? String(contact.full_name) : '';
+  const safeEmail = contact.email ? String(contact.email) : '';
+  const safeCompany = contact.company ? String(contact.company) : '';
+  const safeMessage = contact.message ? String(contact.message) : '';
+
+  const text =
+    `Hello Team AutoRAG,\n\n` +
+    `You have received a new contact form submission from the AutoRAG website.\n\n` +
+    `Name: ${safeName}\n` +
+    `Email: ${safeEmail}\n` +
+    `Company: ${safeCompany}\n` +
+    `Message:\n${safeMessage}\n\n` +
+    `Submitted On: ${new Date().toISOString()}\n`;
+
+  await transport.sendMail({
+    from,
+    to,
+    subject,
+    text,
+    replyTo: safeEmail || undefined,
+  });
+}
+
+async function sendContactEmail(contact) {
+  const transport = buildSmtpTransport();
+  if (transport) {
+    return sendContactEmailViaSmtp(contact);
+  }
+  return sendContactEmailViaEmailJs(contact);
+}
+
 function buildSmtpTransport() {
   const host = process.env.SMTP_HOST;
   const port = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
@@ -570,17 +708,41 @@ app.get('/api/me', requireAuth, async (req, res) => {
   });
 });
 
-app.post('/api/contact', async (req, res) => {
-  const { full_name, email, company, country, phone, message } = req.body || {};
+app.post('/api/contact', requireAuth, async (req, res) => {
+  const { full_name, company, message } = req.body || {};
 
-  await Contact.create({
+  const emailValue = String((req.user && req.user.email) || '').trim();
+  const messageValue = String(message || '').trim();
+  if (!emailValue) {
+    return res.status(400).json({ error: 'email is required' });
+  }
+  if (!messageValue) {
+    return res.status(400).json({ error: 'message is required' });
+  }
+
+  const contactPayload = {
     full_name: full_name || undefined,
-    email: email || undefined,
+    email: emailValue,
     company: company || undefined,
-    country: country || undefined,
-    phone: phone || undefined,
-    message: message || undefined,
-  });
+    message: messageValue,
+  };
+
+  try {
+    await Contact.create(contactPayload);
+  } catch (e) {
+    return res.status(500).json({ error: 'Failed to save contact' });
+  }
+
+  try {
+    await sendContactEmail(contactPayload);
+  } catch (e) {
+    const msg = e && (e.message || String(e));
+    const status = e && e.status ? Number(e.status) : 502;
+    const details = e && e.details ? e.details : undefined;
+    console.error('Failed to send contact email:', msg);
+    if (details) console.error('EmailJS details:', details);
+    return res.status(status).json({ error: msg || 'Failed to send message' });
+  }
 
   return res.status(201).json({ ok: true });
 });
