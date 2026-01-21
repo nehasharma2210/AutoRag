@@ -6,6 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
+    "start:production": "node start-production.js",
     "dev": "node server.js"
   },
   "dependencies": {
