@@ -1,42 +1,52 @@
-FROM node:22-bookworm-slim
+# Multi-stage build for AutoRAG
+FROM node:18-alpine as backend-builder
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    python3-venv \
-    build-essential \
-  && rm -rf /var/lib/apt/lists/*
+# Set working directory
+WORKDIR /app
 
-ENV NODE_ENV=production \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PORT=3001 \
-    LLM_API_PORT=8000 \
-    LLM_API_BIND_HOST=0.0.0.0 \
-    LLM_API_PYTHON=python3
+# Copy backend package files
+COPY backend/package*.json ./backend/
+RUN cd backend && npm install --production
+
+# Copy backend source
+COPY backend/ ./backend/
+
+# Python stage for LLM API
+FROM python:3.9-slim as llm-builder
 
 WORKDIR /app
 
-COPY package.json ./package.json
-COPY backend/package.json backend/package.json
-COPY backend/package-lock.json backend/package-lock.json
+# Copy LLM API requirements
+COPY llm-api/requirements.txt ./llm-api/
+RUN cd llm-api && pip install --no-cache-dir -r requirements.txt
 
-RUN npm --prefix backend ci --omit=dev
+# Copy LLM API source
+COPY llm-api/ ./llm-api/
 
-COPY llm-api/requirements.txt llm-api/requirements.txt
-RUN python3 -m pip install --upgrade pip \
-  && python3 -m pip install -r llm-api/requirements.txt
+# Final stage
+FROM node:18-alpine
 
-COPY backend backend
-COPY AutoRag-website AutoRag-website
-COPY llm-api llm-api
+# Install Python for LLM API
+RUN apk add --no-cache python3 py3-pip
 
-# Create a start script
-RUN echo '#!/bin/bash\ncd /app/llm-api && python3 -m uvicorn self_healing_rag:app --host 0.0.0.0 --port 8000 &\ncd /app && node backend/server.js' > /app/start.sh && chmod +x /app/start.sh
+WORKDIR /app
 
-EXPOSE 3001
-EXPOSE 8000
+# Copy backend from builder
+COPY --from=backend-builder /app/backend ./backend
 
-CMD ["/app/start.sh"]
+# Copy LLM API from builder
+COPY --from=llm-builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=llm-builder /app/llm-api ./llm-api
+
+# Copy frontend
+COPY AutoRag-website/ ./AutoRag-website/
+
+# Copy start script
+COPY start.sh ./
+RUN chmod +x start.sh
+
+# Expose ports
+EXPOSE 3001 8000
+
+# Start command
+CMD ["./start.sh"]
