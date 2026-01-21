@@ -1,52 +1,45 @@
-# Multi-stage build for AutoRAG
-FROM node:18-alpine as backend-builder
+# Use Ubuntu base for better compatibility
+FROM ubuntu:22.04
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    python3 \
+    python3-pip \
+    python3-venv \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy backend package files
+# Copy and install backend dependencies
 COPY backend/package*.json ./backend/
-RUN cd backend && npm install --production
+RUN cd backend && npm install
 
-# Copy backend source
-COPY backend/ ./backend/
-
-# Python stage for LLM API
-FROM python:3.9-slim as llm-builder
-
-WORKDIR /app
-
-# Copy LLM API requirements
+# Copy and install LLM API dependencies
 COPY llm-api/requirements.txt ./llm-api/
-RUN cd llm-api && pip install --no-cache-dir -r requirements.txt
+RUN cd llm-api && pip3 install -r requirements.txt
 
-# Copy LLM API source
+# Copy all source code
+COPY backend/ ./backend/
 COPY llm-api/ ./llm-api/
-
-# Final stage
-FROM node:18-alpine
-
-# Install Python for LLM API
-RUN apk add --no-cache python3 py3-pip
-
-WORKDIR /app
-
-# Copy backend from builder
-COPY --from=backend-builder /app/backend ./backend
-
-# Copy LLM API from builder
-COPY --from=llm-builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
-COPY --from=llm-builder /app/llm-api ./llm-api
-
-# Copy frontend
 COPY AutoRag-website/ ./AutoRag-website/
 
 # Copy start script
 COPY start.sh ./
 RUN chmod +x start.sh
 
+# Create a health check endpoint script
+RUN echo '#!/bin/bash\ncurl -f http://localhost:3001 || exit 1' > /app/healthcheck.sh && chmod +x /app/healthcheck.sh
+
 # Expose ports
 EXPOSE 3001 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD /app/healthcheck.sh
 
 # Start command
 CMD ["./start.sh"]
