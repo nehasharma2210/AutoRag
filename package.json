@@ -5,6 +5,11 @@
   "scripts": {
     "postinstall": "npm --prefix backend install",
     "start": "npm --prefix backend start",
-    "dev": "npm --prefix backend run dev"
+    "dev": "npm --prefix backend run dev",
+    "build": "echo 'Build completed'",
+    "deploy:local": "docker-compose up -d",
+    "deploy:build": "docker build -t autorag .",
+    "logs": "docker-compose logs -f",
+    "stop": "docker-compose down"
   }
 }
