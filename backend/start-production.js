@@ -3,6 +3,9 @@ const path = require('path');
 
 console.log('🚀 Starting AutoRAG Production Services...');
 
+// Get port from environment
+const PORT = process.env.PORT || 3001;
+
 // Start LLM API in background
 console.log('Starting LLM API...');
 const llmProcess = spawn('python3', ['-m', 'uvicorn', 'self_healing_rag:app', '--host', '0.0.0.0', '--port', '8000'], {
@@ -16,7 +19,7 @@ llmProcess.on('error', (err) => {
 
 // Wait a bit for LLM API to start
 setTimeout(() => {
-  console.log('Starting Backend Server...');
+  console.log(`Starting Backend Server on port ${PORT}...`);
   // Start the main server
   require('./server.js');
 }, 5000);

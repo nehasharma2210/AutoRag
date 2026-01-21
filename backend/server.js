@@ -846,8 +846,8 @@ const port = Number(process.env.PORT || 3001);
 
 async function start() {
   await connectDb();
-  app.listen(port, () => {
-    console.log(`Backend running on http://localhost:${port}`);
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`Backend running on port ${port}`);
   });
 }
 
