@@ -22,7 +22,8 @@ import os
 import pickle
 from pathlib import Path
 
-from datasets import load_dataset
+# Removed datasets import - causing PyArrow issues
+# from datasets import load_dataset
 from sentence_transformers import SentenceTransformer
 from bs4 import BeautifulSoup
 from duckduckgo_search import DDGS
@@ -116,17 +117,25 @@ def load_or_build_base_index(embedder: SentenceTransformer) -> Tuple[faiss.Index
         return loaded_index, loaded_chunks
 
     logger.info("Building base index and chunks from scratch...")
-    dataset = load_dataset("wikitext", "wikitext-103-v1", split="train")
+    # Removed dataset loading - using simple text data instead
+    # dataset = load_dataset("wikitext", "wikitext-103-v1", split="train")
+    
+    # Simple fallback data for demo
+    sample_texts = [
+        "AutoRAG is an automated retrieval augmented generation system.",
+        "Machine learning helps in building intelligent applications.",
+        "Natural language processing enables computers to understand human language.",
+        "FastAPI is a modern web framework for building APIs with Python.",
+        "Vector databases store and retrieve high-dimensional vectors efficiently."
+    ]
 
     texts = []
-    for item in dataset:
-        t = item["text"].strip()
-        if t:
-            texts.append(t)
-        if len(texts) >= 1000:
-            break
+    # Use sample texts instead of dataset
+    for text in sample_texts:
+        if text:
+            texts.append(text)
 
-    logger.info(f"Loaded {len(texts)} texts from dataset")
+    logger.info(f"Loaded {len(texts)} texts from sample data")
 
     built_chunks: List[str] = []
     for t in texts:

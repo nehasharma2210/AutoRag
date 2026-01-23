@@ -28,7 +28,7 @@ cd llm-api && python -m uvicorn self_healing_rag:app --host 0.0.0.0 --port $PORT
 
 **Build Command:**
 ```bash
-cd backend && npm install --production
+cd backend && npm install --production --silent
 ```
 
 **Start Command:**
