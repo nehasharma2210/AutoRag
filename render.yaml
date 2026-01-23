@@ -1,11 +1,11 @@
 services:
+  # Backend Service
   - type: web
     name: autorag-backend
     env: node
-    buildCommand: |
-      echo "Installing backend dependencies..."
-      cd backend && npm install --production
-    startCommand: cd backend && npm start
+    plan: free
+    buildCommand: cd backend && npm install --production --silent
+    startCommand: cd backend && node server.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -15,3 +15,18 @@ services:
           name: autorag-backend
           property: port
     healthCheckPath: /api/health
+
+  # LLM API Service  
+  - type: web
+    name: autorag-llm-api
+    env: python
+    plan: free
+    buildCommand: cd llm-api && pip install --no-cache-dir -r requirements.txt
+    startCommand: cd llm-api && python -m uvicorn self_healing_rag:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PORT
+        fromService:
+          type: web
+          name: autorag-llm-api
+          property: port
+    healthCheckPath: /health

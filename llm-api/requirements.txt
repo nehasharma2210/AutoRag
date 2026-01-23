@@ -1,22 +1,20 @@
-# Core FastAPI dependencies - Render compatible versions
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
+# Minimal FastAPI setup
+fastapi==0.95.0
+uvicorn==0.21.0
+pydantic==1.10.7
 
-# Essential ML dependencies - Minimal set
-numpy==1.24.4
-sentence-transformers==2.2.2
-transformers==4.35.2
-torch==2.1.0
-requests==2.31.0
-beautifulsoup4==4.12.2
+# Core dependencies only
+numpy==1.24.0
+requests==2.28.0
+beautifulsoup4==4.11.0
 
-# Vector search - CPU only for Render
-faiss-cpu==1.7.4
+# Simple search
+duckduckgo-search==3.8.0
 
-# Search functionality
-duckduckgo-search==3.9.6
+# Sentence transformers - minimal
+sentence-transformers==2.2.0
+torch==2.0.0
+transformers==4.28.0
 
-# Build tools
-setuptools==68.2.2
-wheel==0.41.3
+# Vector search
+faiss-cpu==1.7.3
