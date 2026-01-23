@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: autorag-backend
+    env: node
+    buildCommand: |
+      echo "Installing backend dependencies..."
+      cd backend && npm install --production
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        fromService:
+          type: web
+          name: autorag-backend
+          property: port
+    healthCheckPath: /api/health

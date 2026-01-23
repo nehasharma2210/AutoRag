@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: autorag-backend
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: |
+      echo "Installing backend dependencies..."
+      cd backend
+      npm install --production
+      echo "Backend build completed!"
+    startCommand: |
+      cd backend
+      node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        fromService:
+          type: web
+          name: autorag-backend
+          property: port
+      - key: LLM_API_BASE_URL
+        value: "https://your-llm-api-service.onrender.com"
+    healthCheckPath: /api/health
+    
+  # Separate Python service for LLM API
+  - type: web
+    name: autorag-llm-api
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: |
+      echo "Installing Python dependencies..."
+      pip install --upgrade pip setuptools wheel
+      cd llm-api
+      pip install --no-cache-dir -r requirements.txt
+      echo "Python build completed!"
+    startCommand: |
+      cd llm-api
+      python -m uvicorn self_healing_rag:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PORT
+        fromService:
+          type: web
+          name: autorag-llm-api
+          property: port
+    healthCheckPath: /health

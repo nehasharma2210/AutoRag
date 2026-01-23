@@ -1,15 +1,22 @@
 {
-  "name": "autorag",
+  "name": "autorag-app",
   "version": "1.0.0",
-  "private": true,
+  "description": "AutoRAG - Automated Retrieval Augmented Generation",
+  "main": "backend/server.js",
   "scripts": {
-    "postinstall": "npm --prefix backend install",
-    "start": "npm --prefix backend start",
-    "dev": "npm --prefix backend run dev",
-    "build": "echo 'Build completed'",
-    "deploy:local": "docker-compose up -d",
-    "deploy:build": "docker build -t autorag .",
-    "logs": "docker-compose logs -f",
-    "stop": "docker-compose down"
-  }
+    "start": "cd backend && node server.js",
+    "build": "cd backend && npm install --production",
+    "dev": "cd backend && node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nehasharma2210/AutoRag.git"
+  },
+  "author": "AutoRAG Team",
+  "license": "MIT"
 }
