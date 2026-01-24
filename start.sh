@@ -39,13 +39,13 @@ echo "Starting LLM API on port 8000..."
 cd /app/llm-api
 
 # Check if the Python script exists
-if [ ! -f "simple_rag.py" ]; then
-    echo "❌ simple_rag.py not found in llm-api directory"
+if [ ! -f "self_healing_rag.py" ]; then
+    echo "❌ self_healing_rag.py not found in llm-api directory"
     exit 1
 fi
 
 # Start LLM API
-python3 -m uvicorn simple_rag:app --host 0.0.0.0 --port 8000 &
+python3 -m uvicorn self_healing_rag:app --host 0.0.0.0 --port 8000 &
 LLM_PID=$!
 
 # Wait for LLM API to be ready

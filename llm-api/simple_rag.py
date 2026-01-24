@@ -1,21 +1,22 @@
 """
-Simple RAG API without heavy ML dependencies
-Mock responses for demo purposes
+Simple RAG API with Wikipedia integration
+Real information from Wikipedia + mock knowledge base
 """
 
 import json
 import random
-from typing import Dict, Any
+from typing import Dict, Any, List
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import requests
 from bs4 import BeautifulSoup
+import wikipedia
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Simple RAG API",
-    description="A lightweight RAG system for demo purposes",
+    title="AutoRAG API with Wikipedia",
+    description="A RAG system with Wikipedia integration",
     version="1.0.0"
 )
 
@@ -25,7 +26,7 @@ class QueryRequest(BaseModel):
     max_results: int = 5
     use_healing: bool = True
 
-# Mock knowledge base
+# Mock knowledge base (fallback)
 MOCK_KNOWLEDGE = [
     "AutoRAG is an automated retrieval augmented generation system that helps process documents intelligently.",
     "Machine learning enables computers to learn and make decisions from data without explicit programming.",
@@ -43,7 +44,45 @@ MOCK_KNOWLEDGE = [
     "Cloud computing provides on-demand access to computing resources over the internet."
 ]
 
-def simple_search(query: str, max_results: int = 3) -> list:
+def search_wikipedia(query: str, max_results: int = 3) -> List[str]:
+    """Search Wikipedia for relevant information"""
+    try:
+        # Set language to English
+        wikipedia.set_lang("en")
+        
+        # Search for pages
+        search_results = wikipedia.search(query, results=max_results)
+        
+        if not search_results:
+            return []
+        
+        wiki_info = []
+        for title in search_results[:max_results]:
+            try:
+                # Get page summary
+                summary = wikipedia.summary(title, sentences=2)
+                wiki_info.append(f"From Wikipedia ({title}): {summary}")
+            except wikipedia.exceptions.DisambiguationError as e:
+                # Handle disambiguation by taking the first option
+                try:
+                    summary = wikipedia.summary(e.options[0], sentences=2)
+                    wiki_info.append(f"From Wikipedia ({e.options[0]}): {summary}")
+                except:
+                    continue
+            except wikipedia.exceptions.PageError:
+                # Page doesn't exist, skip
+                continue
+            except Exception as e:
+                # Other errors, skip this result
+                continue
+                
+        return wiki_info
+        
+    except Exception as e:
+        print(f"Wikipedia search error: {e}")
+        return []
+
+def simple_search(query: str, max_results: int = 3) -> List[str]:
     """Simple keyword-based search in mock knowledge base"""
     query_lower = query.lower()
     results = []
@@ -55,7 +94,7 @@ def simple_search(query: str, max_results: int = 3) -> list:
     
     return results[:max_results]
 
-def web_search(query: str, max_results: int = 2) -> list:
+def web_search(query: str, max_results: int = 2) -> List[str]:
     """Simple web search using DuckDuckGo"""
     try:
         from duckduckgo_search import DDGS
@@ -73,9 +112,10 @@ def web_search(query: str, max_results: int = 2) -> list:
 async def root():
     """Root endpoint with API information."""
     return {
-        "message": "Simple RAG API",
+        "message": "AutoRAG API with Wikipedia",
         "version": "1.0.0",
         "status": "running",
+        "features": ["Wikipedia search", "Knowledge base", "Web search"],
         "endpoints": {
             "POST /query": "Query the RAG system",
             "GET /health": "Health check",
@@ -88,48 +128,62 @@ async def health():
     """Health check endpoint."""
     return {
         "status": "healthy",
-        "service": "Simple RAG API",
-        "version": "1.0.0"
+        "service": "AutoRAG API with Wikipedia",
+        "version": "1.0.0",
+        "wikipedia": "enabled"
     }
 
 @app.post("/query")
 async def query_rag(request: QueryRequest):
     """
-    Query the simple RAG system.
-    Returns mock responses based on simple keyword matching.
+    Query the RAG system with Wikipedia integration.
+    Returns real information from Wikipedia + knowledge base.
     """
     try:
         query = request.query.strip()
         if not query:
             raise HTTPException(status_code=400, detail="Query cannot be empty")
         
-        # Simple knowledge base search
-        kb_results = simple_search(query, max_results=3)
+        print(f"Processing query: {query}")
         
-        # Web search if enabled
+        # Search Wikipedia first (primary source)
+        wiki_results = search_wikipedia(query, max_results=2)
+        print(f"Wikipedia results: {len(wiki_results)}")
+        
+        # Search knowledge base (secondary)
+        kb_results = simple_search(query, max_results=2)
+        print(f"Knowledge base results: {len(kb_results)}")
+        
+        # Web search if enabled and needed
         web_results = []
-        if request.use_healing:
-            web_results = web_search(query, max_results=2)
+        if request.use_healing and len(wiki_results) == 0:
+            web_results = web_search(query, max_results=1)
+            print(f"Web search results: {len(web_results)}")
         
-        # Combine results
-        all_results = kb_results + web_results
+        # Combine results (prioritize Wikipedia)
+        all_results = wiki_results + kb_results + web_results
         
-        # Generate simple response
+        # Generate response
         if all_results:
-            response_text = f"Based on the available information about '{query}', here's what I found:\n\n"
+            response_text = f"Here's what I found about '{query}':\n\n"
+            
             for i, result in enumerate(all_results[:request.max_results], 1):
                 response_text += f"{i}. {result}\n\n"
             
-            response_text += "This response was generated using a simple RAG system for demonstration purposes."
+            if wiki_results:
+                response_text += "✅ Information sourced from Wikipedia and knowledge base."
+            else:
+                response_text += "ℹ️ Information from knowledge base and web search."
         else:
-            response_text = f"I couldn't find specific information about '{query}' in the knowledge base. This is a demo system with limited knowledge."
+            response_text = f"I couldn't find specific information about '{query}'. Try rephrasing your question or asking about a different topic."
         
         return {
-            "query": query,
             "response": response_text,
+            "query": query,
             "sources": all_results[:request.max_results],
             "metadata": {
                 "total_sources": len(all_results),
+                "wikipedia_sources": len(wiki_results),
                 "kb_sources": len(kb_results),
                 "web_sources": len(web_results),
                 "threshold": request.threshold,
@@ -138,6 +192,7 @@ async def query_rag(request: QueryRequest):
         }
         
     except Exception as e:
+        print(f"Query processing error: {e}")
         raise HTTPException(status_code=500, detail=f"Query processing failed: {str(e)}")
 
 if __name__ == "__main__":
