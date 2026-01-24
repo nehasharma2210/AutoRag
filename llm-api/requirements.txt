@@ -1,20 +1,11 @@
-# Minimal FastAPI setup
+# Ultra-minimal FastAPI setup - NO ML dependencies
 fastapi==0.95.0
 uvicorn==0.21.0
 pydantic==1.10.7
 
-# Core dependencies only
-numpy==1.24.0
+# Basic dependencies only
 requests==2.28.0
 beautifulsoup4==4.11.0
 
 # Simple search
 duckduckgo-search==3.8.0
-
-# Sentence transformers - minimal
-sentence-transformers==2.2.0
-torch==2.0.0
-transformers==4.28.0
-
-# Vector search
-faiss-cpu==1.7.3

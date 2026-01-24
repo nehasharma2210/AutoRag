@@ -22,7 +22,7 @@ services:
     env: python
     plan: free
     buildCommand: cd llm-api && pip install --no-cache-dir -r requirements.txt
-    startCommand: cd llm-api && python -m uvicorn self_healing_rag:app --host 0.0.0.0 --port $PORT
+    startCommand: cd llm-api && python -m uvicorn simple_rag:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PORT
         fromService:
