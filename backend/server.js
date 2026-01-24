@@ -175,24 +175,24 @@ async function sendContactEmailViaEmailJs(contact) {
   const apiUrl = (process.env.EMAILJS_API_URL || 'https://api.emailjs.com/api/v1.0/email/send').trim();
   const now = new Date();
 
-  await requestText(
-    'POST',
-    apiUrl,
-    {
-      service_id: process.env.EMAILJS_SERVICE_ID,
-      template_id: process.env.EMAILJS_TEMPLATE_ID,
-      user_id: process.env.EMAILJS_PUBLIC_KEY,
-      template_params: {
-        name: contact.full_name || '',
-        email: contact.email || '',
-        message: contact.message || '',
-        date: now.toISOString(),
-        full_name: contact.full_name || '',
-        company: contact.company || '',
-      },
+  const payload = {
+    service_id: process.env.EMAILJS_SERVICE_ID,
+    template_id: process.env.EMAILJS_TEMPLATE_ID,
+    user_id: process.env.EMAILJS_PUBLIC_KEY,
+    template_params: {
+      name: contact.full_name || '',
+      email: contact.email || '',
+      message: contact.message || '',
+      date: now.toISOString(),
+      full_name: contact.full_name || '',
+      company: contact.company || '',
     },
-    20000
-  );
+  };
+
+  console.log('Sending EmailJS request to:', apiUrl);
+  console.log('EmailJS payload:', JSON.stringify(payload, null, 2));
+
+  await requestText('POST', apiUrl, payload, 15000); // 15 second timeout
 }
 
 async function sendContactEmailViaSmtp(contact) {
@@ -235,11 +235,21 @@ async function sendContactEmailViaSmtp(contact) {
 }
 
 async function sendContactEmail(contact) {
+  // Try EmailJS first (more reliable on Render)
+  try {
+    await sendContactEmailViaEmailJs(contact);
+    return;
+  } catch (emailJsError) {
+    console.log('EmailJS failed, trying SMTP:', emailJsError.message);
+  }
+  
+  // Fallback to SMTP
   const transport = buildSmtpTransport();
   if (transport) {
     return sendContactEmailViaSmtp(contact);
   }
-  return sendContactEmailViaEmailJs(contact);
+  
+  throw new Error('Both EmailJS and SMTP are unavailable');
 }
 
 function buildSmtpTransport() {
@@ -256,6 +266,9 @@ function buildSmtpTransport() {
     port,
     secure,
     auth: { user, pass },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 5000,    // 5 seconds
+    socketTimeout: 10000,     // 10 seconds
   });
 }
 
@@ -734,14 +747,28 @@ app.post('/api/contact', requireAuth, async (req, res) => {
   }
 
   try {
+    console.log('Attempting to send contact email for:', contactPayload.email);
     await sendContactEmail(contactPayload);
+    console.log('Contact email sent successfully');
   } catch (e) {
     const msg = e && (e.message || String(e));
     const status = e && e.status ? Number(e.status) : 502;
     const details = e && e.details ? e.details : undefined;
     console.error('Failed to send contact email:', msg);
+    console.error('Error details:', e);
     if (details) console.error('EmailJS details:', details);
-    return res.status(status).json({ error: msg || 'Failed to send message' });
+    
+    // Return more specific error message
+    let errorMessage = 'Failed to send message';
+    if (msg.includes('EmailJS is not configured')) {
+      errorMessage = 'Email service is not properly configured';
+    } else if (msg.includes('timeout') || msg.includes('ETIMEDOUT')) {
+      errorMessage = 'Email service timeout - please try again';
+    } else if (msg.includes('Connection')) {
+      errorMessage = 'Unable to connect to email service';
+    }
+    
+    return res.status(status).json({ error: errorMessage });
   }
 
   return res.status(201).json({ ok: true });
