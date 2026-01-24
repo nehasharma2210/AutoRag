@@ -1,12 +1,26 @@
-# Ultra-minimal FastAPI setup with Wikipedia
-fastapi==0.95.0
-uvicorn==0.21.0
-pydantic==1.10.7
+# FastAPI and server dependencies
+fastapi>=0.95.0,<1.0.0
+uvicorn[standard]>=0.21.0,<1.0.0
+pydantic>=1.10.7,<2.0.0
 
-# Basic dependencies
-requests==2.28.0
-beautifulsoup4==4.11.0
-wikipedia==1.4.0
+# Core ML and data processing
+numpy>=1.21.0,<2.0.0
+faiss-cpu>=1.7.0,<2.0.0
+sentence-transformers>=2.2.0,<3.0.0
 
-# Simple search
-duckduckgo-search==3.8.0
+# Web scraping and search
+requests>=2.28.0,<3.0.0
+beautifulsoup4>=4.11.0,<5.0.0
+duckduckgo-search>=3.8.0,<4.0.0
+
+# Optional: Wikipedia (for fallback)
+wikipedia>=1.4.0,<2.0.0
+
+# Additional dependencies for self-healing RAG
+scikit-learn>=1.2.0,<2.0.0
+torch>=1.13.0,<3.0.0
+transformers>=4.21.0,<5.0.0
+
+# Additional utilities
+urllib3>=1.26.0,<2.0.0
+certifi>=2022.0.0

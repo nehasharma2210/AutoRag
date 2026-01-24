@@ -710,15 +710,25 @@ async def startup_event():
     """Initialize the RAG system on startup."""
     global embedder, base_index, base_chunks
     
-    logger.info("Initializing Self-Healing RAG System...")
-    
-    # Load embedder
-    logger.info("Loading sentence transformer model...")
-    embedder = SentenceTransformer("all-MiniLM-L6-v2")
+    try:
+        logger.info("Initializing Self-Healing RAG System...")
+        
+        # Load embedder
+        logger.info("Loading sentence transformer model...")
+        embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
-    base_index, base_chunks = load_or_build_base_index(embedder)
+        base_index, base_chunks = load_or_build_base_index(embedder)
 
-    logger.info(f" RAG System initialized successfully! Base index contains {base_index.ntotal} vectors")
+        logger.info(f"✅ RAG System initialized successfully! Base index contains {base_index.ntotal} vectors")
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize RAG system: {e}")
+        logger.error("This might be due to missing dependencies or insufficient memory.")
+        logger.error("Please check that all requirements are installed: pip install -r requirements.txt")
+        # Don't exit - let the app start with basic functionality
+        embedder = None
+        base_index = None
+        base_chunks = []
+        logger.warning("⚠️ Starting with limited functionality - some features may not work")
 
 
 @app.get("/")
@@ -759,6 +769,21 @@ async def query_rag(request: QueryRequest):
     try:
         if not request.query or not request.query.strip():
             raise HTTPException(status_code=400, detail="Query cannot be empty")
+        
+        # Check if system is properly initialized
+        if embedder is None or base_index is None:
+            # Fallback response when system isn't fully initialized
+            return QueryResponse(
+                query=request.query,
+                answer=f"I apologize, but the AI system is not fully initialized yet. This might be due to missing dependencies or insufficient resources. Please try again in a few moments, or contact support if the issue persists. Your query was: '{request.query}'",
+                before_answer="System not initialized",
+                trust_score_before=0.0,
+                trust_score_after=0.0,
+                healing_triggered=False,
+                healing_successful=False,
+                sources_used=["System Error"],
+                timestamp=datetime.now().isoformat()
+            )
         
         result = autorag_with_diff(
             query=request.query,

@@ -44,8 +44,18 @@ if [ ! -f "self_healing_rag.py" ]; then
     exit 1
 fi
 
-# Start LLM API
-python3 -m uvicorn self_healing_rag:app --host 0.0.0.0 --port 8000 &
+# Run health check first
+echo "🔍 Running pre-flight health check..."
+if [ -f "health_check.py" ]; then
+    python3 health_check.py
+    if [ $? -ne 0 ]; then
+        echo "⚠️ Health check failed, but continuing with startup..."
+    fi
+fi
+
+# Start LLM API with better error handling
+echo "🚀 Starting LLM API server..."
+python3 -m uvicorn self_healing_rag:app --host 0.0.0.0 --port 8000 --log-level info &
 LLM_PID=$!
 
 # Wait for LLM API to be ready

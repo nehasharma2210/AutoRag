@@ -18,9 +18,10 @@ WORKDIR /app
 COPY backend/package*.json ./backend/
 RUN cd backend && npm install
 
-# Copy and install LLM API dependencies
-COPY llm-api/requirements.txt ./llm-api/
-RUN cd llm-api && pip3 install -r requirements.txt
+# Copy and install LLM API dependencies with fallback
+COPY llm-api/requirements*.txt ./llm-api/
+COPY llm-api/install_deps.py ./llm-api/
+RUN cd llm-api && python3 install_deps.py
 
 # Copy all source code
 COPY backend/ ./backend/
