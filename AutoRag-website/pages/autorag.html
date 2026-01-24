@@ -300,6 +300,21 @@
 
             if (!messagesEl || !inputEl || !sendEl) return;
 
+            // Auto-detect API base URL for production
+            (function() {
+                try {
+                    const currentHost = window.location.origin;
+                    const isProduction = currentHost.includes('onrender.com') || currentHost.includes('herokuapp.com');
+                    
+                    if (isProduction && !localStorage.getItem('api_base_url')) {
+                        localStorage.setItem('api_base_url', currentHost);
+                        console.log('Auto-detected API base URL:', currentHost);
+                    }
+                } catch (e) {
+                    console.error('Failed to auto-detect API base URL:', e);
+                }
+            })();
+
             function getApiBaseUrl() {
                 try {
                     const v = String(localStorage.getItem('api_base_url') || '').trim();
@@ -401,7 +416,7 @@
                         return;
                     }
 
-                    const answer = data && data.answer ? String(data.answer) : '';
+                    const answer = data && (data.response || data.answer) ? String(data.response || data.answer) : '';
                     thinkingBubble.textContent = answer || 'No answer returned.';
 
                     if (data && (data.trust_score_after !== undefined || data.healing_triggered !== undefined)) {

@@ -320,6 +320,21 @@
     <!-- Mobile menu toggle script -->
     <script src="../assets/auth.js"></script>
     <script>
+        // Auto-detect API base URL for production
+        (function() {
+            try {
+                const currentHost = window.location.origin;
+                const isProduction = currentHost.includes('onrender.com') || currentHost.includes('herokuapp.com');
+                
+                if (isProduction && !localStorage.getItem('api_base_url')) {
+                    localStorage.setItem('api_base_url', currentHost);
+                    console.log('Auto-detected API base URL:', currentHost);
+                }
+            } catch (e) {
+                console.error('Failed to auto-detect API base URL:', e);
+            }
+        })();
+
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
@@ -356,7 +371,20 @@
             submitBtn.disabled = true;
 
             try {
-                const resp = await fetch('/api/contact', {
+                // Get API base URL (same logic as chatbot)
+                function getApiBaseUrl() {
+                    try {
+                        const v = String(localStorage.getItem('api_base_url') || '').trim();
+                        return v ? v.replace(/\/$/, '') : '';
+                    } catch (e) {
+                        return '';
+                    }
+                }
+
+                const apiBase = getApiBaseUrl();
+                const apiUrl = (apiBase ? apiBase : '') + '/api/contact';
+
+                const resp = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
