@@ -34,7 +34,13 @@ MOCK_KNOWLEDGE = [
     "Vector databases are specialized databases designed to store and query high-dimensional vectors efficiently.",
     "Retrieval Augmented Generation (RAG) combines information retrieval with text generation for better responses.",
     "AI and machine learning are transforming how businesses process and understand documents.",
-    "Document intelligence involves extracting meaningful information from various document formats."
+    "Document intelligence involves extracting meaningful information from various document formats.",
+    "New Delhi is the capital of India, located in the northern part of the country.",
+    "India is a diverse country with 28 states and 8 union territories.",
+    "Python is a popular programming language used for AI and machine learning applications.",
+    "Mumbai is the financial capital of India and the most populous city in the country.",
+    "Artificial Intelligence is revolutionizing various industries including healthcare, finance, and education.",
+    "Cloud computing provides on-demand access to computing resources over the internet."
 ]
 
 def simple_search(query: str, max_results: int = 3) -> list:
@@ -53,13 +59,15 @@ def web_search(query: str, max_results: int = 2) -> list:
     """Simple web search using DuckDuckGo"""
     try:
         from duckduckgo_search import DDGS
-        with DDGS() as ddgs:
-            results = []
-            for result in ddgs.text(query, max_results=max_results):
-                results.append(f"From web: {result.get('body', '')[:200]}...")
-            return results
+        results = []
+        ddgs = DDGS()
+        search_results = ddgs.text(query, max_results=max_results)
+        for result in search_results:
+            results.append(f"From web: {result.get('body', '')[:200]}...")
+        return results
     except Exception as e:
-        return [f"Web search unavailable: {str(e)}"]
+        # Return empty list instead of error message for cleaner responses
+        return []
 
 @app.get("/")
 async def root():
