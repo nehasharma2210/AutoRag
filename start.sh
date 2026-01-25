@@ -41,9 +41,9 @@ cd /app/llm-api
 # Check memory and decide which model to use
 MEMORY_LIMIT=${MEMORY_LIMIT:-512}
 if [ "$MEMORY_LIMIT" -lt 1024 ]; then
-    echo "🔧 Low memory detected (${MEMORY_LIMIT}MB), using lightweight model..."
+    echo "🔧 Low memory detected (${MEMORY_LIMIT}MB), using ultra-lightweight model..."
     PYTHON_FILE="lightweight_rag.py"
-    REQUIREMENTS_FILE="requirements-light.txt"
+    REQUIREMENTS_FILE="requirements-ultra-light.txt"
 else
     echo "🚀 Sufficient memory detected, using full model..."
     PYTHON_FILE="self_healing_rag.py"
@@ -57,19 +57,15 @@ if [ ! -f "$PYTHON_FILE" ]; then
 fi
 
 # Install appropriate requirements if needed
-if [ -f "$REQUIREMENTS_FILE" ] && [ ! -f ".deps_installed" ]; then
+if [ -f "$REQUIREMENTS_FILE" ] && [ ! -f ".deps_installed_$(basename $REQUIREMENTS_FILE)" ]; then
     echo "📦 Installing dependencies from $REQUIREMENTS_FILE..."
-    pip3 install -r "$REQUIREMENTS_FILE" && touch .deps_installed
+    pip3 install --no-cache-dir -r "$REQUIREMENTS_FILE" && touch ".deps_installed_$(basename $REQUIREMENTS_FILE)"
+else
+    echo "✅ Dependencies already installed, skipping..."
 fi
 
-# Run health check first
-echo "🔍 Running pre-flight health check..."
-if [ -f "health_check.py" ]; then
-    python3 health_check.py
-    if [ $? -ne 0 ]; then
-        echo "⚠️ Health check failed, but continuing with startup..."
-    fi
-fi
+# Skip health check to save memory during startup
+echo "⚡ Skipping health check to save memory..."
 
 # Start LLM API with better error handling
 echo "🚀 Starting LLM API server with $PYTHON_FILE..."

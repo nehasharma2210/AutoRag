@@ -113,24 +113,10 @@ def search_wikipedia_simple(query: str, max_results: int = 2) -> List[str]:
         return []
 
 def web_search_simple(query: str, max_results: int = 1) -> List[str]:
-    """Simple web search fallback"""
-    try:
-        # Try DuckDuckGo search if available
-        from duckduckgo_search import DDGS
-        results = []
-        ddgs = DDGS()
-        search_results = ddgs.text(query, max_results=max_results)
-        for result in search_results:
-            body = result.get('body', '')[:200]
-            if body:
-                results.append(f"From web: {body}...")
-        return results
-    except ImportError:
-        logger.info("DuckDuckGo search not available")
-        return []
-    except Exception as e:
-        logger.warning(f"Web search failed: {e}")
-        return []
+    """Simple web search fallback - disabled for ultra-low memory"""
+    # Disabled to save memory - DuckDuckGo search uses too much RAM
+    logger.info("Web search disabled to save memory")
+    return []
 
 @app.on_event("startup")
 async def startup_event():
