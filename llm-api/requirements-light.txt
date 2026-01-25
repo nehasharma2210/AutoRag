@@ -1,0 +1,11 @@
+# Lightweight requirements for 512MB memory limit
+fastapi>=0.95.0,<1.0.0
+uvicorn[standard]>=0.21.0,<1.0.0
+pydantic>=1.10.7,<2.0.0
+
+# Basic web scraping (lightweight)
+requests>=2.28.0,<3.0.0
+beautifulsoup4>=4.11.0,<5.0.0
+
+# Optional search (only if memory allows)
+duckduckgo-search>=3.8.0,<4.0.0
