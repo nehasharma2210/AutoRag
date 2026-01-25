@@ -3,6 +3,10 @@ fastapi>=0.95.0,<1.0.0
 uvicorn[standard]>=0.21.0,<1.0.0
 pydantic>=1.10.7,<2.0.0
 
+# Core Python libraries (built-in but ensuring compatibility)
+# warnings, re, logging, os, pickle, pathlib are built-in
+# typing, datetime, urllib.parse are built-in
+
 # Core ML and data processing
 numpy>=1.21.0,<2.0.0
 faiss-cpu>=1.7.0,<2.0.0
@@ -16,11 +20,29 @@ duckduckgo-search>=3.8.0,<4.0.0
 # Optional: Wikipedia (for fallback)
 wikipedia>=1.4.0,<2.0.0
 
-# Additional dependencies for self-healing RAG
-scikit-learn>=1.2.0,<2.0.0
+# Dependencies for sentence-transformers (auto-installed but ensuring versions)
 torch>=1.13.0,<3.0.0
 transformers>=4.21.0,<5.0.0
+scikit-learn>=1.2.0,<2.0.0
+scipy>=1.9.0,<2.0.0
+huggingface-hub>=0.15.0,<1.0.0
 
-# Additional utilities
+# Additional ML utilities
+tokenizers>=0.13.0,<1.0.0
+tqdm>=4.64.0,<5.0.0
+
+# Network and security
 urllib3>=1.26.0,<2.0.0
 certifi>=2022.0.0
+charset-normalizer>=2.0.0,<4.0.0
+
+# File handling and serialization
+Pillow>=9.0.0,<11.0.0
+
+# Optional but recommended for better performance
+regex>=2022.0.0
+
+# Additional dependencies that might be needed
+packaging>=21.0
+filelock>=3.0.0
+safetensors>=0.3.0
